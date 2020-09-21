@@ -1,0 +1,24 @@
+body {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 300;
+}
+
+header {
+  border-bottom: 1px solid #ccc;
+  padding: 20px 20px;
+}
+header .headerWrapper {
+  margin: auto;
+  max-width: 660px;
+}
+header .brandTitle {
+  font-weight: bold;
+  color: #0c0c0c;
+}
+
+main {
+  padding: 0 20px;
+  max-width: 660px;
+  margin: auto;
+}
