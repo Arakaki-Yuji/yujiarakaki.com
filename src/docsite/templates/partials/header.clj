@@ -3,6 +3,6 @@
 (def header
   [:header
    [:div.headerWrapper
-    [:div.brandTitle "Yuji's Docs"]
+    [:div.brandTitle "Yuji Arakaki"]
     ]
    ])

@@ -10,8 +10,10 @@
           [:main
            [:div.articleList
             [:div.article
-             [:h3.articleTitle [:a {:href "/"} "記事のタイトル"] ]
-             [:p.articlePublishedAt "公開日: 2020-09-23"]
+             [:a {:href "/"}
+              [:h3.articleTitle  "記事のタイトル" ]
+              [:p.articlePublishedAt "公開日: 2020-09-23"]
+              ]
              ]
             [:div.article
              [:h3.articleTitle [:a {:href "/"} "記事のタイトル"] ]
