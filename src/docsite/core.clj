@@ -3,12 +3,11 @@
             [docsite.templates.article :as article-page]
             [markdown.core :refer [md-to-html-string]]
             [clojure.string :as string]
-            [docsite.articles :refer [read-articles-from-disc]])
+            [docsite.articles :refer [read-articles-from-disc]]
+            [docsite.config :refer [public-articles-path public-path]])
   (:gen-class))
 
-(def public-path "resources/public")
 
-(def public-articles-path (str public-path "/articles"))
 
 (defn compile-article-page [doc-path page-name]
   (let [md (slurp doc-path)
@@ -23,7 +22,8 @@
       )))
 
 (defn compile-index-page []
-  (spit (str public-path "/index.html") (index-page/page)))
+  (spit (str public-path "/index.html")
+        (index-page/page (read-articles-from-disc))))
 
 (defn static-compile []
   (do
