@@ -3,6 +3,6 @@
 (def header
   [:header
    [:div.headerWrapper
-    [:div.brandTitle "Yuji Arakaki"]
+    [:div.brandTitle [:a {:href "/"} "Yuji Arakaki"]]
     ]
    ])

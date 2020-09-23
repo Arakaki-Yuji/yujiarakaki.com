@@ -1,17 +1,15 @@
 (ns docsite.core
   (:require [docsite.templates.index :as index-page]
             [docsite.templates.article :as article-page]
-            [markdown.core :refer [md-to-html-string]]
+            [markdown.core :refer [md-to-html-string-with-meta]]
             [clojure.string :as string]
             [docsite.articles :refer [read-articles-from-disc]]
             [docsite.config :refer [public-articles-path public-path]])
   (:gen-class))
 
-
-
 (defn compile-article-page [doc-path page-name]
   (let [md (slurp doc-path)
-        html (md-to-html-string md)]
+        html (:html (md-to-html-string-with-meta md))]
     (spit (str public-articles-path "/" page-name ".html")
           (article-page/page html))))
 
