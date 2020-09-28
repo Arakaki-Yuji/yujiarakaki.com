@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">フレームワークなくとも秩序は成り立つ ~ フロントエンドJavaScript ~</h1><div class="content">
+<h1>はじめに</h1>
+
+<p>いま開発しているWebアプリケーションでフロントエンドのJSを書こうとしているときに、以前の開発でAngularJSを使用していた経験があることもあり、自然にどの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>を採用しようかと色々物色しておりました。</p>
+
+<p>AngularJSの他にもEmberやKnockout, Backbornなど調査してみたんですが、どの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>も「SPA」(シングルページアプリケーション)を作ることを前提に作られているようでした。</p>
+
+<p>自分が開発中のアプリケーションはSPAではないし、AngularJSを採用したプロジェクトの時もバックエンドで採用している<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>との相性とかで結構苦労したのでどうしようかな〜と考えて、っていうかフロントエンドMV*<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>いる？って所から考えなおしてみました。</p>
+
+<h1>フロントエンドMV*<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>を使いたい理由</h1>
+
+<p>もちろんチームやプロダクトの性質によると思いますが、僕が考えた上では</p>
+
+<ol>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D3%A5%B8%A5%CD%A5%B9%A5%ED%A5%B8%A5%C3%A5%AF">ビジネスロジック</a>とプレゼンテーションを分離したい。</li>
+<li>コードに構造を持たせて使い回ししやすく、見通しよくしたい。</li>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>やライブラリの力で効率化したい。</li>
+</ol>
+
+
+<p>のような感じかな〜と思いました。</p>
+
+<p>適当にJSでゴリゴリ書いちゃうとどのファイルに何があるかがわからずに見通しが悪くなるし、JSはUIをいじることに使われる特性上デザインの変更に対して対応出来ないといけないので変更ができるだけ簡単に行えるようにしておかないといけない。
+さらにあわよくばデータ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%F3%A5%C7%A5%A3%A5%F3%A5%B0">バインディング</a>やフィルタやらの力を借りて効率よく開発したいって感じです。</p>
+
+<h1>忘れちゃならない<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%EC%A1%BC%A5%C9%A5%AA%A5%D5">トレードオフ</a></h1>
+
+<p>ただ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>の採用にはもちろん良いことだけでなく、以下のような<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%EC%A1%BC%A5%C9%A5%AA%A5%D5">トレードオフ</a>も存在します。</p>
+
+<ol>
+<li>学習コスト</li>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>への依存</li>
+</ol>
+
+
+<h2>学習コスト</h2>
+
+<p>その<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>を使いこなせるようになるとどんどん開発効率が上がっていきます。</p>
+
+<p>ただその<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>を使いこなすまでにはその<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>独特の概念や<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>を学習するのにそれなりの時間がかかり、さらにそれを使いこなすためにも時間がかかります。</p>
+
+<p>さらに<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>を使うと必ずその<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>独特の問題などぶつかることも多く、それを解決するのに余計な時間がかかってしまう可能性も考慮する必要があります。</p>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>への依存</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>はあらゆるアプリケーションに使えるわけではなく、その<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>が想定している<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E6%A1%BC%A5%B9%A5%B1%A1%BC%A5%B9">ユースケース</a>があります。
+その<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E6%A1%BC%A5%B9%A5%B1%A1%BC%A5%B9">ユースケース</a>に沿って使えば効率良く開発が行えますが、そこから外れたことをやろうとすると余計なHackが必要になってしまいます。</p>
+
+<p>そのため<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>の選定を間違えると余計なコストがかかったり、わざわざ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>に合わせたアプリケーションになってしまうという恐れもあります。</p>
+
+<h1>必要ないなら使わない方が良い</h1>
+
+<p>今回私が行っているWebアプリケーション開発の状況は以下のような感じでした。</p>
+
+<ul>
+<li>このアプリケーション開発以外のプロジェクトもやってる</li>
+<li>アプリケーションはSPAじゃない</li>
+<li>インフラ、バックエンド、フロントエンド、ネイティブアプリまで全てを担当するためフロントエンドの専任エンジニアはいない</li>
+</ul>
+
+
+<p>ざっくり言うと、「やることはたくさんあるから<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>の選定ミスで余計なコストを掛けたくない！」っていう状況です。</p>
+
+<p>その状況のなかで考えたときに</p>
+
+<ul>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>の機能での効率化は今回の場合学習コスト + 相性の悪さで多分チャラになる</li>
+<li>でも見境なくJS書いてカオスにもしたくない。</li>
+<li>自分である程度JSの構造化をすればいいんじゃね?</li>
+</ul>
+
+
+<p>っていうことになりました。</p>
+
+<h1>おれおれのフロントエンドJS設計</h1>
+
+<p>フロントエンド<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>で書くコードをざっくり以下の様に分離します。</p>
+
+<ul>
+<li>Model: <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D3%A5%B8%A5%CD%A5%B9%A5%ED%A5%B8%A5%C3%A5%AF">ビジネスロジック</a>の管理</li>
+<li>Template: HTMLの生成</li>
+<li>ViewModel: イベントハンドリングやデータフロー</li>
+</ul>
+
+
+<p>ディレクトリ構造は以下のような感じになります。</p>
+
+<pre class="code" data-lang="" data-unlink>
+├── javascripts
+│   ├── models
+│   │   └── user.js
+│   ├── templates
+│   │   └── errors_message_template.js
+│   │   └── day_options_template.js
+│   └── viewmodels
+│       ├── profile_viewmodel.js
+│       └── top_viewmodel.js
+</pre>
+
+
+<h2>Model (<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D3%A5%B8%A5%CD%A5%B9%A5%ED%A5%B8%A5%C3%A5%AF">ビジネスロジック</a>)</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/MVC">MVC</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>でもモデルと呼ばれ 、アプリケーション特有のロジックを入れるレイヤーです。
+たとえばユーザープロフィールの登録ページを実装する場合、Userというモデルオブジェクトを作り、そこにバリデーションの条件やバックエンドの<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>との通信などのコードを書きます。</p>
+
+<p>ここにあるコードはデザインとの結びつきがなく、どのページでも使いまわせるようにしておきます。</p>
+
+<p>参考コードとして下記のUserモデルをのせておきます。</p>
+
+<pre class="code" data-lang="" data-unlink>
+function User(name, email, job) {
+   var self = this;
+   self.name = name:
+   self.email = email;
+   self.job    = job
+
+   self.nameIsBlank = function(){
+      self.name.length === 0;
+   }
+
+}
+</pre>
+
+
+<h2>Template(HTMLの生成)</h2>
+
+<p>入力フォームをチェックしてエラーメッセージを表示したり、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>やユーザーのアクションに反応して変化するHTMLを生成するコードです。
+例えば日付に関する入力フォームで年、月、日のセレクトボックスがある場合、年、月が変更されると日のセレクトボックスのoptionタグはその月にある日の数に合わせて変化しないといけません（8月なら31個、2月なら28個のように）。</p>
+
+<p>それを実現するために年と月の値からoptionタグを必要な数だけ生成するコードを書きます。</p>
+
+<p>ここは同じようなHTMLが必要な箇所があれば上手く使いまわせるように引数によって動的な値を管理します。</p>
+
+<p>以下に年と月を引数に受け取って必要なoptionタグを生成するTemplateのコードを記載します。</p>
+
+<pre class="code" data-lang="" data-unlink>/*
+ * 引数のyearとmonthからその月の開始日と終了日までのoptionタグを生成する。
+ * selectedDayに指定した日付のoptionタグにはselected=&#34;selected&#34;の属性を設定する。
+ * 例:
+ * &lt;option value=&#34;1&#34;&gt;1&lt;/option&gt;
+ * &lt;option value=&#34;2&#34;&gt;2&lt;/option&gt;
+ * &lt;option value=&#34;3&#34; selected=&#34;selected&#34;&gt;3&lt;/option&gt;
+ * &lt;option value=&#34;4&#34;&gt;4&lt;/option&gt;
+ * &lt;option value=&#34;5&#34;&gt;5&lt;/option&gt;
+ * .
+ * .
+ * &lt;option value=&#34;31&#34;&gt;31&lt;/option&gt;
+ *
+ */
+function DayOptionsTemplate(year, month, selectedDay){
+    var self = this;
+    var jsMonth = month - 1;
+    var monthFirstDate = new Date(year, jsMonth, 1);
+    var monthLastDate  = new Date(year, jsMonth + 1, 0);
+    self.template = generateTemplate(monthFirstDate.getDate(),
+                                     monthLastDate.getDate(),
+                                     selectedDay);
+
+    function generateTemplate(firstday, lastDay, selectedDay){
+
+        function a_day_option_template(day, selected){
+            var attr = &#39;&#39;;
+            if (selected === true){
+                attr += &#39; selected=&#34;selected&#34;&#39;;
+            }
+            var template = &#39;&lt;option value=&#34;&#39; + String(day) + &#39;&#34;&#39; + attr + &#39;&gt;&#39; +
+                String(day) +
+                &#39;&lt;/option&gt;&#39;;
+            return template;
+        }
+
+        var template = &#39;&#39;;
+
+        for(var i=firstday;
+            i&lt;=lastDay;
+            i++) {
+            var selected = i === selectedDay ? true : false;
+            template += a_day_option_template(i, selected);
+        }
+        return template;
+    }
+}
+
+</pre>
+
+
+<h2>ViewModel(イベントハンドリング・データフロー)</h2>
+
+<p>HTMLの要素に対してイベントをつけたり、モデルの変更をキャッチした結果生成したHTMLを実際のDOMに差し込んだりする所です。</p>
+
+<p>ここの部分が一番DOMに結びつきやすく、使い回しも効きにくいため、Webアプリケーションのページ毎に作成するイメージです。</p>
+
+<p>DOMと結びついた面倒な部分をここに押し込めることで他のModelやTemplateの独立性を高めています。</p>
+
+<p>以下にプロフィール登録ページのViewModelのサンプルコードを記載します。</p>
+
+<pre class="code" data-lang="" data-unlink>
+ProfileViewModel = function(){
+  var self = this;
+   
+  $(document).ready(function(){
+        
+       // イベントハンドリング  
+       $(&#39;form[name=&#34;profile&#34; button.submit]&#39;).click(function(){
+
+          // データフロー
+          // Formの値をモデルに与える
+          var name = $(&#39;input[name=&#34;user[name]&#34;&#39;).val();
+          var email = $(&#39;input[name=&#34;user[email]&#34;&#39;).val();
+          var job     = $(&#39;input[name=&#34;user[job]&#34;&#39;).val();
+
+          var user = new User(name, email, job);
+          if (user.nameIsBlank === true)
+             alert(&#39;名前を入力して下さい&#39;);
+             return false
+          end          
+       });
+
+       // イベントハンドリング
+       $(&#39;select[name=&#39;month&#39;]&#39;).change(function(){
+          // データフロー
+          // 選択されている値を元にテンプレートを作成する
+          var year    = $(&#39;select[name=&#39;year&#39;]&#39;).val();
+          var month = $(&#39;select[name=&#39;month&#39;]&#39;).val();
+          var day     = $(&#39;select[name=&#39;day&#39;]&#39;).val();
+          var dayOptions = DayOptionsTemplate(year, month, day);
+
+          // テンプレートの差し込み
+          if ($(&#34;select[name=&#39;day&#39;]&#34;).children().length &gt; 0){
+              $(&#34;select[name=&#39;day&#39;]&#34;).empty();
+          }
+          $(&#34;select[name=&#39;day&#39;]&#34;).prepend(dayOptions.template);
+          
+       })
+  });
+
+}
+</pre>
+
+
+<p>このViewModelを使いたいページで実行すれば、必要な処理がすべて用意されるという感じです。</p>
+
+<p>ViewModelの実行はscriptタグで行っても良いですが、dispatcherを作ってURLで必要なVIewModelをセットすると
+より見通しさらによくなります。</p>
+
+<pre class="code" data-lang="" data-unlink>dispatcher(&#34;^/profile&#34;, function(){
+    ProfileViewModel();
+});
+
+function dispatcher(path, func){
+    dispatcher.path_func = dispatcher.path_func = dispatcher.path_func || []
+    if (func) return dispatcher.path_func.push([path, func]);
+    for(var i = 0, l = dispatcher.path_func.length; i&lt;l; ++i ){
+        var func = dispatcher.path_func[i];
+        var match = path.match(func[0]);
+        match &amp;&amp; func[1](match)
+    };
+};
+
+dispatcher(location.pathname);
+
+</pre>
+
+
+<h2>終わりに</h2>
+
+<p>とりあえずJSがカオスにならずに秩序をもって構造化でき、ある程度使い回しが可能なコードが作れるような設計を、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>なしで実現できるように取り組んでみました。</p>
+
+<p>いままさに開発中のアプリケーションでは結構気持ちよくこの設計が使えていますが、まだまだ解決したい問題は多々あります。</p>
+
+<p>たとえば分離したJSファイルの依存性を解決したり、Templateが純粋なJSなのでデザイナーが触りづらいなど色々あります。</p>
+
+<p>その解決方法も目処は立っている(依存性解決はWebpackを使ったり、Templateもそれを解決してくれそうなライブラリがある)のですが、いまは自分達のプロジェクトでは回っているので問題が顕在化しそうになってから取り組めば良いかな〜という感じです。</p>
+
+<p>必要なコストが払えるのであれば<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>を導入するのも良いですが、 自分達のプロジェクトに最適化した設計を行なうことが出来るのであればその方が効率は上がるし、プログラミングをしていてもかなり楽しくなるのでおすすめします^^</p>
+
+</div></section></main></body></html>

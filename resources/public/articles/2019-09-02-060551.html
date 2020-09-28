@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">Microsoft Hackfest(マイクロソフト ハックフェスト) | ペアプロした２日間、自社サービスをAKSに乗せる過程で学んだこと</h1><div class="content">
+<p>2019年8月21日(水)〜22日(木)の2日間、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Microsoft">Microsoft</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>アドボケイトである寺田佳央さんに弊社に来ていただいてHackfestを開催して頂きました。</p>
+
+<p>Hackfestとは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Microsoft">Microsoft</a>のエンジニアの方と自社が抱える課題をテーマとして決め、それを一緒に解決していくというイベントです。</p>
+
+<p>今回はAzureを使った基盤をテーマにしていて、Azureを使ったインフラを管理しているのは弊社で基本僕のみのため、寺田さんと2日間がっつり<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DA%A5%A2%A5%D7%A5%ED">ペアプロ</a>できるめちゃくちゃ貴重な機会でした。</p>
+
+<p>非常に多くの学びが得られる濃密な体験だったため、その学びをブログで共有したいと思います。</p>
+
+<h1>テーマ決め 〜 イシュー(課題)ドリブンでまず始める 〜</h1>
+
+<p>今回Hackfestを開催していただけた経緯が２つあります。
+１つは僕が自社のサービス基盤として<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>を使うことを考えていて、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>を学んでいることを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Twitter">Twitter</a>に投稿していたのを寺田さんに見ていただいたこと。
+もう１つは寺田さんがちょうど <a class="keyword" href="http://d.hatena.ne.jp/keyword/Java">Java</a> や Azure <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a> Serviceに関するコミュニティイベントを日本全国で行うという ジャパンツアーを行う計画をしており、その沖縄開催を行うので、その数日前にハックフェストをやりますか？という提案を頂いたことでした。</p>
+
+<p>その経緯から、Azure <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a> Serviceについての<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%CF%A5%C3%A5%AB%A5%BD%A5%F3">ハッカソン</a>をとりあえず始めるという流れになるかな〜と考えていたのですが、寺田さんがまず最初に行ったのは「御社の現状の開発体制やシステム/サービスの構成、そしてなぜ<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>を使いたいと考えていたのですか？」と僕らの現状と課題を<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D2%A5%A2%A5%EA">ヒアリ</a>ングするところからでした。</p>
+
+<p>寺田さんが今回のハックフェストやその後行ったコミュニティイベントでも終始おっしゃっていたのが、「<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>も課題を解決するための道具でしかない。すべてを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>でやるべきではなくて、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>が得意でかつ自分達の課題に合っているところだけを使いましょう」ということでした。この姿勢は本当にプ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E9%A5%AF">ラク</a>ティカルで、僕も同じような姿勢で仕事しようとはしていますがたまに「この技術が流行っているから導入したい」になってしまうことがあります。しかしエンジニアとして「技術を用いて課題を解決すること」を職務とする以上、この姿勢は見習わないといけないと思いました。</p>
+
+<p>寺田さんに<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D2%A5%A2%A5%EA">ヒアリ</a>ングしてもらった中で整理された現状と、僕が<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>で解決したいと考えている課題は以下の通りでした。</p>
+
+<ul>
+<li>現時点では数個のサービスが稼働しているだけなので<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>なしでも問題ない</li>
+<li>ただし、今後1年以内にどんどん新しいサービスがリリース、既存サービスのアップデートがされていく可能性が非常に高い</li>
+<li>製品開発のエンジニアはどんどん採用を強化していくが、SREの方は増えてもあと一人くらい。</li>
+<li>最小人数のSREで今後加速度的に増えるサービス群のサーバー構築、CI/CDの構築、スケーラビリティの確保、ログ収集やモニタリングなどを扱っていくとSREがサービス提供の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DC%A5%C8%A5%EB%A5%CD%A5%C3%A5%AF">ボトルネック</a>になってしまう可能性があるので、それらを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>とそのエコシステムを使うことで解決したい</li>
+</ul>
+
+
+<p>この課題を元に、「今動いている自社サービスのアプリを実際にAzure <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a> Serviceに乗せてみて、CI/CD、スケーラビリティの確保、ログ収集・モニタリングの設定などを構築してみる」をテーマにHackfestを行うこととなりました。</p>
+
+<h1>CloudShell 〜 ブラウザと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%DE%A5%DB">スマホ</a>アプリで使えるシェル環境 〜</h1>
+
+<p>Azure <a class="keyword" href="http://d.hatena.ne.jp/keyword/Portal">Portal</a>画面に入ったあとに<a class="keyword" href="http://d.hatena.ne.jp/keyword/AKS">AKS</a>などの各種リソースを作成する際、寺田さんからCloudShellというAzureの機能について紹介して頂きました。</p>
+
+<p>CloudShellというはAzureのポータルから起動できるShell環境で、ブラウザからそのCloudShellを使うと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Bash">Bash</a>や<a class="keyword" href="http://d.hatena.ne.jp/keyword/PowerShell">PowerShell</a>を使った各種コマンドが使えるようになります。
+CloudShell上で作られたファイルなどはCloudShell用のFile Storageに保存されるため、そこに<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%A7%A5%EB%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">シェルスクリプト</a>を配置して実行するなんてことも可能ですし、CloudShell上から<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C8%EB%CC%A9%B8%B0">秘密鍵</a>を用いて<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/VM">VM</a>にログインすることもできます。
+さらに、僕はこのとき初めて知ったのですがAzureの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%DE%A5%DB">スマホ</a>アプリが実はあり、その<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%DE%A5%DB">スマホ</a>アプリ上でCloudShellを起動することが出来ます。</p>
+
+<p>PC上に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>操作するコマンドを入れるのは、間違った操作で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>を破壊できてしまうことと複数のアカウントを使っている場合、いまaz loginしているのはどれ？ってなる恐怖で抵抗がありましたが、CloudShellを使えばそんなに心配することなく az コマンドが使える上にもしものときはモバイルからも操作できるので、これは今後もよく使っていこうと思いました。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fazure.microsoft.com%2Fja-jp%2Ffeatures%2Fcloud-shell%2F" title="Azure Cloud Shell – ブラウザーベースのコマンド ライン | Microsoft Azure" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://azure.microsoft.com/ja-jp/features/cloud-shell/">azure.microsoft.com</a></cite></p>
+
+<h1>アプリケーション用のイメージ作り 〜イメージのサイズを小さくすること、開発効率向上のためのマルチステージビルド〜</h1>
+
+<p>実際のアプリケーションを<a class="keyword" href="http://d.hatena.ne.jp/keyword/kubernetes">kubernetes</a>に乗せるというテーマだったので、まずアプリケーションのコンテナ化から開始しました。</p>
+
+<p>開発環境自体はDocker + docker-compose で構築しているのでDockerfile自体はすでにあったのですが、それを単純にイメージにすると4GB超えの巨大なイメージになってしまったため、そのスリム化に着手することに。</p>
+
+<p>開発でずっと使っていた環境をADDするだけだったものを、log系、tmp、cache、画像などアプリケーション自体とは関係ないファイル群を取り除いてイメージを作り直しても 1.4GBほどでまだまだでかい。。</p>
+
+<p>最終的にこれ以上スリム化するのはアプリケーションの構造やFROMで設定しているイメージの変更など、大幅な変更が必要だと判断して一旦今回はそのまま行くことになりましたが、このイメージ作りの過程で寺田さんか以下の点を教わりました。</p>
+
+<ul>
+<li>なぜイメージサイズを小さくしなければいけないのか</li>
+<li>開発効率を上げるために行うコンテナのマルチステージビルド</li>
+</ul>
+
+
+<h2>なぜイメージサイズを小さくしなければいけないのか</h2>
+
+<h3>デプロイやスケールアウトにかかる時間が遅くなる</h3>
+
+<p>コンテナで作ったアプリケーションをデプロイする、またスケールアウトするためには該当するバージョンのイメージをコンテナ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%B8%A5%B9%A5%C8%A5%EA">レジストリ</a>からダウンロードしてからそれを起動する必要があります。</p>
+
+<p>イメージのサイズが大きいとその分ダウンロードにかかる時間が増えてしまい、それによってデプロイ・スケールアウトの速度が低下してしまいます。
+同じサーバー上で同じイメージを使う場合にはキャッシュが効きますが、新しいバージョンのデプロイ、またホストマシンがマネージドサービスの場合などはキャッシュが効かずダウンロードが発生するケースが多いのでイメージサイズの大きさはかなり速度に悪影響を及ぼします。</p>
+
+<p>本番環境にデプロイ・スケールアウトするとき以外にもCI/CDを組むと、それらを回すたびにイメージのダウンロードが発生し、その速度がCI/CDの速度の低下、引いては開発速度の低下につながってしまいます。</p>
+
+<h3>ホストマシンのディスクサイズの圧迫</h3>
+
+<p>Azure <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a> Servicesを使う場合にNodeとして扱うサーバーは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B2%BE%C1%DB%A5%DE%A5%B7%A5%F3">仮想マシン</a>になります。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%B2%BE%C1%DB%A5%DE%A5%B7%A5%F3">仮想マシン</a>なので当たり前ですがディスクサイズの制限があります。</p>
+
+<p>ここに大きいサイズのイメージがずっと貯まり続けていくとディスクサイズの圧迫に繋がります。
+ホストマシンであるNodeに入って不要なイメージを削除することで対応することは出来ますが、それを頻繁に気にしないといけない状態は良くないのでイメージサイズは小さい方がいいです。</p>
+
+<h2>開発効率向上のためのマルチステージビルド</h2>
+
+<p>イメージ作成の際、最初はひとつのDockerfileにすべての設定を書いていたのですが、あとからbase-DockerfileとDockerfile２つにファイルを分けてイメージ作成をするようにしました。</p>
+
+<p>base-Dockerfileは実行環境に必要なものを作るDockerfileで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>や<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>のインストールや設定などを入れていきます。
+Dockerfileの方はアプリケーションコードを入れるためのDockerfileで、アプリケーションコードをADDしたりcomposer installなどをしています。</p>
+
+<p>このように環境とアプリのDockerfileを分離することで、責任範囲を明確にし、依存の関係もはっきりします。
+Dockerfileの書き方を変えてキャッシュの効き方を最適化する上でも効率的に作業できるようになりました。</p>
+
+<h1>Container Registry 〜 コンテナイメージの保管場所 〜</h1>
+
+<p>アプリケーションのDockerイメージを作ったあとは、Azure <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a> Services上からイメージをダウンロードできるようにリモートのコンテナ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%B8%A5%B9%A5%C8%A5%EA">レジストリ</a>にプッシュしなければなりません。</p>
+
+<p>Azure上にはContainer Registryのサービスがあるので、そちらを利用しました。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fazure.microsoft.com%2Fja-jp%2Fservices%2Fcontainer-registry%2F" title="Azure Container Registry – Docker Registry | Microsoft Azure" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://azure.microsoft.com/ja-jp/services/container-registry/">azure.microsoft.com</a></cite></p>
+
+<p>Container Registryを作るときに 「管理者ユーザー」を有効にするとユーザー名とパスワードによる認証でContainer Registryとプッシュ/プルすることができます。</p>
+
+<p>管理者ユーザーを使わなくても azコマンドが使えれば azコマンド経由で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%B8%A5%B9%A5%C8%A5%EA">レジストリ</a>にログインしてプッシュ/プルすることができるのでセキュリティ的にはこっちの方がよさそうです。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fdocs.microsoft.com%2Fja-jp%2Fazure%2Fcontainer-registry%2Fcontainer-registry-get-started-portal%23log-in-to-registry" title="クイック スタート - Azure でのプライベート Docker レジストリの作成 - Azure portal" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://docs.microsoft.com/ja-jp/azure/container-registry/container-registry-get-started-portal#log-in-to-registry">docs.microsoft.com</a></cite></p>
+
+<h1>Azure <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a> Serviceを使いながらの基本概念を学ぶ</h1>
+
+<p>実際にデプロイするイメージを作ったあとは、実際に<a class="keyword" href="http://d.hatena.ne.jp/keyword/AKS">AKS</a>を使いながら<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>の理解を深めていきました。</p>
+
+<h2>Node</h2>
+
+<p>Nodeとは、Kuberntesの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>が乗るホストマシンの事です。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/AKS">AKS</a>の場合、Azureの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B2%BE%C1%DB%A5%DE%A5%B7%A5%F3">仮想マシン</a>をNodeとして使用しています。そしてNodeとして扱う<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B2%BE%C1%DB%A5%DE%A5%B7%A5%F3">仮想マシン</a>群は、ひとつの可用性セットという含めることでパッチ適応によるアップデートや物理障害時にすべてのNodeがダウンしないように管理されています。</p>
+
+<p>しかし、あくまで単一リージョン内の可用性セットにNodeが含まれている状態のため、リージョン全体に対する障害などは保護されていません。</p>
+
+<p>リージョン障害などからも保護するには、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AKS">AKS</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>を別リージョンにも作成し、上流にAzure Traffic Managerを配置してルーティングを管理する必要があります。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/AKS">AKS</a>での事業継続性の担保や<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%A3%A5%B6%A5%B9%A5%BF%A5%EA%A5%AB%A5%D0%A5%EA">ディザスタリカバリ</a>ーについてはAzureドキュメントが用意されているのでそちらを参考にすると良さそうです。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fdocs.microsoft.com%2Fja-jp%2Fazure%2Faks%2Foperator-best-practices-multi-region" title="Azure Kubernetes Services (AKS) での高可用性とディザスター リカバリー" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://docs.microsoft.com/ja-jp/azure/aks/operator-best-practices-multi-region">docs.microsoft.com</a></cite></p>
+
+<h2>Pod</h2>
+
+<p>Podとは、「複数のコンテナを束ねたもの」です。
+Kuberntesが扱う最小単位がこのPodになります。</p>
+
+<p>Podの特徴として、「Podとして束ねられたコンテナは必ず同一ノードにデプロイされる」という特徴があります。</p>
+
+<p>例えば<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>アプリケーションのよくある構成として、前段にnginxをおいてリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トを受け取けから後ろにいる<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>-fpmに流してで処理を行うという2段構成になることがあります。
+その構成においてnginxと<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>-fpmが動くNodeが別のNodeになるとマシンを超えたネットワーク通信が発生しパフォーマンスがその分悪化してしまいます。それをPodという単位に束ねることで同一ノードにデプロイされ、通信のオーバヘッドが抑えられる効果があるので、依存関係の強いコンテナ同士はPodにまとめる必要があります。</p>
+
+<p>Pod自体は単体で動作しますが、それ自体に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>の特徴として取り上げられる以下のような機能は持っていません。</p>
+
+<ul>
+<li>ローリングアップデート</li>
+<li>ヘルスチェック</li>
+<li>自動修復機能</li>
+<li>スケール・オートスケール</li>
+</ul>
+
+
+<h2>Deployment</h2>
+
+<p>各Podに対して、ローリングアップデート、ヘルスチェック、自動修復機能、スケール・オートスケールなどを設定しているのがDeploymentです。
+Deploymentを定義する<a class="keyword" href="http://d.hatena.ne.jp/keyword/yaml">yaml</a>の中で、アップデート方法の定義やヘルスチェックの定義(liveness, readiness)、スケール(replicas)などを定義すると<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>に反映させることができます。</p>
+
+<p>今回の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%CF%A5%C3%A5%AB%A5%BD%A5%F3">ハッカソン</a>では、<a class="keyword" href="http://d.hatena.ne.jp/keyword/yaml">yaml</a>レベルではDeploymentを最小単位として操作しました。</p>
+
+<h2>Service</h2>
+
+<p>Serviceとは、「論理的にまとめられた<a class="keyword" href="http://d.hatena.ne.jp/keyword/Pods">Pods</a>群に対する通信ポリシーを定義するもの」です。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>上にデプロイされたPodは各ノードに配置されそれぞれプライベートの<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>を持っています。
+しかし新しいバージョンのアプリをリリースするたびに新しいPodが作られ古いPodは削除されていくので、その<a class="keyword" href="http://d.hatena.ne.jp/keyword/IP%A5%A2%A5%C9%A5%EC%A5%B9">IPアドレス</a>に対して通信することは適切ではありません。</p>
+
+<p>Serviceは特定の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Pods">Pods</a>群に対する通信を管理し、そのサービスに対しての<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>が自動で割り振られます。その<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>に対してリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トを送るとServiceが管理している<a class="keyword" href="http://d.hatena.ne.jp/keyword/Pods">Pods</a>群に対してリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トが行くという仕組みになっています。</p>
+
+<p>Serviceはあくまで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>内部での通信を管理するもののため、Service自体を外部からのリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トを受けれるように公開することは推奨されていません(Serviceの指定をLoadBalancerにすることで外部公開することができるが、やるべきではない)</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>外部からの通信を受けれるようにするには、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ingress">Ingress</a>というものをつかいます。</p>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ingress">Ingress</a></h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ingress">Ingress</a>は外部サービスのリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トを受けつけ、それを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>内部にあるServiceにルーティングする役割をもっています。</p>
+
+<p>基本的にnginxを<a class="keyword" href="http://d.hatena.ne.jp/keyword/ingress">ingress</a>として<a class="keyword" href="http://d.hatena.ne.jp/keyword/AKS">AKS</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>内にデプロイされ使用します。まだプレビューの段階ですが、Azure Load Balancerというマネージドサービスを使うこともできるようです。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fdocs.microsoft.com%2Fja-jp%2Fazure%2Faks%2Fload-balancer-standard" title="プレビュー - Azure Kubernetes Service (AKS) で Standard SKU ロード バランサーを使用する" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://docs.microsoft.com/ja-jp/azure/aks/load-balancer-standard">docs.microsoft.com</a></cite></p>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>、そしてAzure <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a> Serviceのメリットはなにか？</h1>
+
+<p>今回のハックフェストを通して、いままで朧げだった<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>そしてAzure <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a> Serviceによって何を得られるかがわかってきました。</p>
+
+<h2>ブルーグリーンデプロイメントにより安全なリリース</h2>
+
+<p>ブルーグリーンデプロイメントとは、新しいバージョンのアプリをリリースする際に既存の環境の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>をアップデートするのではなく、新しいバージョンの環境(サーバー)自体を作り、リク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>ト向き先を変えることでリリースデプロイを行うことです。
+これにより、もし新しいバージョンのアプリに不具合があったとしても前の環境をしばらく残しておけば向き先を変えることで即座に復旧することができます。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>にブルーグリーンデプロイメントを行うには、ブルーとグリーン２つのDeploymentを作り、そこへのリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トをServiceのフィルタリングで切り替える方法があります。</p>
+
+<p>例えばblue-deployment.<a class="keyword" href="http://d.hatena.ne.jp/keyword/yaml">yaml</a>とgreen-deployment.<a class="keyword" href="http://d.hatena.ne.jp/keyword/yaml">yaml</a>というファイルを作り、そのファイルのラベル付けでversionというラベルにblueとgreenをそれぞれ設定しておきます。Service上の通信ポリシーではblueのみ通信が行くように設定しておきます。</p>
+
+<p>新しいバージョンのアプリをデプロイする際にはgreen-deployment.<a class="keyword" href="http://d.hatena.ne.jp/keyword/yaml">yaml</a>の方に新しいDockerイメージを名前とラベル(webapp:2.0など)を指定して<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>上にデプロイします。デプロイが完了したらServiceの通信ポリシーをblueからgreenに変更すると、即座にgreenがリリースされることになります。もし不具合が発生したらService通信ポリシーをgreenからblueに変更すると、前のバージョンに即戻すことができます。</p>
+
+<p>これをさらに応用すると、greenをデプロイしたあと、一般ユーザーに公開している<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>からのリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トはblue、開発者用の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>から来たリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トはgreenにリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トを流すという風に設定することで、本番とまったく同じ環境で安全に動作検証をして問題なければリリースと言うフローを作ることも可能になります。</p>
+
+<p>このブルーグリーンデプロイメントによる安全なリリースにより、以下の効果があると考えています。
+- 安全を確保するための、夜間作業によるリリース作業を減らせる
+- 本番でしか起きない不具合やパフォーマンス問題の発見を早められる
+- 簡単に元に戻せることにより、事前のクオリティ担保のためテストを減らしてリリース頻度と速度を高めることができる</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>を使わなくても、自分で仕組みを構築するなどすれば出来なくはないですが、それを簡単に作れる仕組みがあるのは非常に魅力的に感じました。</p>
+
+<h2>Container Instanceを使ったNodeの制限を超えたスケーラビリティ</h2>
+
+<p>これはAzure <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a> Servicesを使った場合のメリットになります。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>は複数のNodeの上に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>を作ってPodを稼働させるため、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>に参加しているNodeの合計のリリース量(CPU，メモリ、ディスク)によってPodがスケールアウトできる数に物理的な制限が発生します。
+もちろんあとからNodeを追加することも可能ですが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>へのNodeの追加には非常に時間がかかるため突発的または計画的に急激なアクセスが発生する場合にNodeの数を毎度増減するのには向いていません。</p>
+
+<p>Azure Kuberentes Servicesの場合、Podを稼働させる環境をNode上からContainer InstancesというAzureのマネージドサービスに数分レベルで切り替えることができ、Container Instancesに切り替えるとNodeの制限を超えた数のPodを走らせる事が可能になります。</p>
+
+<p>これにより、通常稼働時に必要十分なNodeだけを動かしておき、プッシュ通知やイベントなどの急激なアクセス増があるときのみContainer Instancesに切り替えてスケールアウトし、通常に稼働戻ったらまたNodeに戻すことでコストの最適化をしながららスケーラビリティを確保することができます。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fazure.microsoft.com%2Fja-jp%2Fservices%2Fcontainer-instances%2F" title="Azure Container Instances | Microsoft Azure" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://azure.microsoft.com/ja-jp/services/container-instances/">azure.microsoft.com</a></cite></p>
+
+<h2>infrastructure as codeの実現</h2>
+
+<p>現在の僕らのインフラ環境は、Azure WebAppを使っている場合と単純な<a class="keyword" href="http://d.hatena.ne.jp/keyword/VM">VM</a>を使っているもの、単純な<a class="keyword" href="http://d.hatena.ne.jp/keyword/VM">VM</a>を使っているものもAnsibleによって設定がコード化されているものとされていないものなどが乱立している状態です。また、それらへデプロイフローもそれぞれ違う状態になっています。</p>
+
+<p>これを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>化することにより、インフラ環境やデプロイフローなどは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/yaml">yaml</a>ファイルでコード化・共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>され、アプリの実<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B9%D4%B4%F0">行基</a>盤はDockerfileによるコード化されることになります。</p>
+
+<p>これによって、サービス毎に作らなければならないインフラやDevOps周りの共通部分を再利用しやすくなり、製品開発チームが増えサービスが増えていくときにSREが<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DC%A5%C8%A5%EB%A5%CD%A5%C3%A5%AF">ボトルネック</a>となることが防げると考えられました。</p>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>のデメリットはなにか？</h1>
+
+<p>今回のハックフェスト通して寺田さんは常に「すべてを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>でやるべきではない。<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>も<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%E4%A4%CE%C3%C6%B4%DD">銀の弾丸</a>ではない」ということをおっしゃっていました。寺田さんが明示的におっしゃっていたことと、僕が考えたことを交えながら<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>のデメリットも書いておこうと思います。</p>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>自体のバージョンアップへの追従</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>自体のバージョンアップが3ヶ月に一度リリースされます。その度に大きな機能追加が発生したり、いま使っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/yaml">yaml</a>ファイルの記法が変わり新しく作り直す必要が発生する可能性があります。</p>
+
+<p>Azure <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a> Serviceのバージョンポリシーが最新から4バージョンまでをサポートするという方針です。</p>
+
+<p>それはつまり、「いま最新バージョンの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>を使っても来年には必ずバージョンアップをしないといけない」ということです。</p>
+
+<p>4バージョンのアップデートはかなり大変のため、現実的には3ヶ月または半年に一度はバージョンアップしていくという方針になるでしょう。</p>
+
+<p>このバージョンの作業も複雑な構成の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>を組めば組むほど、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B5%A1%BC%A5%C9%A5%D1%A1%BC%A5%C6%A5%A3">サードパーティ</a>のライブラリを入れれば入れるほど困難になっていきます。</p>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DD%A1%BC%A5%CD%A5%F3%A5%C8">コンポーネント</a>が増えることによる障害発生のデバック・パフォーマンスチューニングなどの難易度が上がる</h2>
+
+<p>普通に<a class="keyword" href="http://d.hatena.ne.jp/keyword/VM">VM</a>上でWebアプリをリリース場合、よくある構成は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%C9%A5%D0%A5%E9%A5%F3%A5%B5%A1%BC">ロードバランサー</a> -> <a class="keyword" href="http://d.hatena.ne.jp/keyword/VM">VM</a>(WebApp) -> DB という3段構成です。
+これを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>上の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>に載せた場合、以下のようになります。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ingress">Ingress</a>(<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%C9%A5%D0%A5%E9%A5%F3%A5%B5%A1%BC">ロードバランサー</a>) -> Service -> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Pods">Pods</a>(WebAppのコンテナ群)/Node -> DB</p>
+
+<p>通信経路上に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>が扱っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DD%A1%BC%A5%CD%A5%F3%A5%C8">コンポーネント</a>が登場し、障害発生した場合やパフォーマンスチューニングを行う場合はそれらの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DD%A1%BC%A5%CD%A5%F3%A5%C8">コンポーネント</a>をすべて考慮にいれて対応しなければなりません。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>がもたらした大きな柔軟性とそれによって得られるアジリティはこれら<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DD%A1%BC%A5%CD%A5%F3%A5%C8">コンポーネント</a>、抽象化の層によってもたらされています。逆に障害時やパフォーマンスチューニング時はその抽象化の層を降りていく必要があり、抽象化の数だけ降りなければいけないのはいわば当然の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%EC%A1%BC%A5%C9%A5%AA%A5%D5">トレードオフ</a>になります。</p>
+
+<h1>僕が考える、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>とはなんのための、そして誰のためのソフトウェアか</h1>
+
+<p>これも寺田さんがおっしゃったことではなく、あくまで今回のハックフェストを通して僕が考えたことです。</p>
+
+<p>僕は今回のハックフェストを通して、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>は「少人数のSREチームで、たくさんのマシンリソースを効率的に使いながら、たくさんのサービス、そしてそのサービス開発自体を支えるためのソフトウェア」だと理解しました。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>は、素晴らしい機能群によってインフラに大きな柔軟性をもたらし、それによってデプロイ、復旧、スケールアウト、マルチバージョンのリリースによるABテストなど様々なことを簡単に実現できるようにしてくれます。しかも<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>内のNodeに集積してコンテナを稼働させることによって効率的にマシンリソースを使うことも可能にしてくれます。</p>
+
+<p>しかしその<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%EC%A1%BC%A5%C9%A5%AA%A5%D5">トレードオフ</a>として、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>自体のバージョンアップへの追随やトラブル時に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>の抽象化を理解して降りていく必要性が発生します。<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>を導入する場合、イニシャルコストよりもこの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E9%A5%F3%A5%CB%A5%F3%A5%B0%A5%B3%A5%B9%A5%C8">ランニングコスト</a>の方をよく理解しておいた方が良いと思いました。</p>
+
+<p>大きなメリットは得られるが、インフラを管理するSREのようなエンジニアが不要になるものではなく、むしろそこを管理するSREは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>を理解して使いこなす必要があるのでよりスキルが必要かもしれません</p>
+
+<p>少人数の優秀なSREで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>を扱い多くの製品や開発チームを支えることができれば、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%D0%A5%EC%A5%C3%A5%B8">レバレッジ</a>が効いて非常に良い投資となりますが、逆に製品が少ない、また開発チーム自体が少ないのであれば投資対効果は低くなりがちで、Azure Web Appなどのマネージドサービスを使う方がメリットが大きいと思います</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>というソフトウェア自体は面白いですし、今後もキャッチアップを続けていきますが、自分達の事業や開発チームにとってホントに必要なタイミングは見極めた上で導入は検討していきたいと思います。</p>
+
+<h1>Azure DevOps 〜 CI/CDに必要な機能全部入りの最強<a class="keyword" href="http://d.hatena.ne.jp/keyword/SaaS">SaaS</a> 〜</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/AKS">AKS</a>でアプリを動かすというのも一通り終わったあと、寺田さんのおすすめのAzure DevOpsというツールを使ってCI/CDのパイプラインを作ることになりました。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fazure.microsoft.com%2Fja-jp%2Fservices%2Fdevops%2F" title="Azure DevOps Services | Microsoft Azure" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://azure.microsoft.com/ja-jp/services/devops/">azure.microsoft.com</a></cite></p>
+
+<p>Azure DevOpsは、まさにDevOpsのために必要な機能がすべて入っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/SaaS">SaaS</a>で、タスク管理のためカンバンなどが使えるBoard、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>を保管するためのプライベートのGit<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%DD%A5%B8%A5%C8%A5%EA">リポジトリ</a>のRepos、CI/CDを作るための Pipelineなどが使えます。</p>
+
+<p>今回はCI/CDを作るということで、
+ReposというGit<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EA%A5%DD%A5%B8%A5%C8%A5%EA">リポジトリ</a>に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>をpushすると、
+Pipelineのビルドパイプラインが動いて新しいバージョンのDockerイメージをビルドしContainer Registryにプッシュし、
+Pipelineのリリースパイプラインによって、新しいバージョンイメージが<a class="keyword" href="http://d.hatena.ne.jp/keyword/kubernetes">kubernetes</a>上にデプロイされる
+というパイプラインを作っていきました。</p>
+
+<p>これらのパイプラインを作るのがすべて<a class="keyword" href="http://d.hatena.ne.jp/keyword/GUI">GUI</a>でタスクを選択して設定を入れていくだけ構築することができ、大体2~3時間程度ですべて構築することができました。
+また、このパイプラインは<a class="keyword" href="http://d.hatena.ne.jp/keyword/GUI">GUI</a>だけでなく<a class="keyword" href="http://d.hatena.ne.jp/keyword/yaml">yaml</a>で定義することもできます。</p>
+
+<p>Azureとのインテグレーションがかなりよく出来ているので、本番環境をAzureで構築している身としては<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>は使わなくてもこのAzure DevOpsはぜひ導入していきたいと思えました。</p>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DA%A5%A2%A5%D7%A5%ED">ペアプロ</a>/モブプロの効能</h1>
+
+<p>今回のハックフェストはずっと寺田さんと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DA%A5%A2%A5%D7%A5%ED">ペアプロ</a>する形で進めていたのですが、僕にとって今年一番の集中力が発揮され、2日間のハックフェスト中まったく集中が切れることなくすすめる事ができました。
+集中力が深く長時間維持できたことでかなり効率よくハックフェストをすすめることができ、当初3日間やる予定だったものが2日間で終わらせることができ、僕も寺田さんもヘロヘロになって「明日は休みましょうw」となる程でした。</p>
+
+<p>寺田さんが一緒だったということが非常に大きかったとは思いますが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DA%A5%A2%A5%D7%A5%ED">ペアプロ</a>/モブプロすることにより</p>
+
+<ul>
+<li>一人でやるよりも「いまやるべきこと」が明確化され、集中しやすい。</li>
+<li>予期しないことがあってハマった場合、複数の脳で解決策を探索して議論して素早くトライすることで解決が早い</li>
+<li>一緒に同じ画面を見て作業することで、予期しない学びが得られる(<a class="keyword" href="http://d.hatena.ne.jp/keyword/bash">bash</a>のショートカットやデバックの仕方など)</li>
+</ul>
+
+
+<p>のような効果を身を持って体感することができました。</p>
+
+<p>今回はハックフェストでしたが、実際の業務でも<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DA%A5%A2%A5%D7%A5%ED">ペアプロ</a>/モブプロを取り入れてみて生産性が上がるかどうかぜひ試して見たいと思いましたし、僕がこれからコミュニティで勉強会などやるときも<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DA%A5%A2%A5%D7%A5%ED">ペアプロ</a>/モブプロの使ってやってやりたいとおもいます。</p>
+
+<h1>最後に</h1>
+
+<p>今回のハックフェストを寺田さんに開催していただいたことで、僕個人としてはAzure/<a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a>に限らないほどエンジニアとして多くの学びを得る事ができました。</p>
+
+<p>会社としても、実際にAzure <a class="keyword" href="http://d.hatena.ne.jp/keyword/Kubernetes">Kubernetes</a> Serviceを使うべきかどうかの技術検証を、わずか2日間のハックフェストで実際に動かしながら把握することができたのは非常に投資対効果が大きかったと考えています。</p>
+
+<p>今回学んだことを実際の現場に活かして、より良いサービスを作っていきたいと思います。</p>
+
+<p>寺田さん、今回は本当にありがとうございました！！！</p>
+
+</div></section></main></body></html>

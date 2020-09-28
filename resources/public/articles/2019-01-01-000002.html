@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">2018年の振り返り</h1><div class="content">
+<h1>仕事</h1>
+
+<p>前半戦はionicframeworkを使った<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%DE%A5%DB">スマホ</a>アプリのリニューアル &amp; 新機能であるC2Cの商品売買<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A1%BC%A5%B1%A5%C3%A5%C8%A5%D7%A5%EC%A5%A4%A5%B9">マーケットプレイス</a>の構築を行い、開発チームのリーダーとしてフロントエンドからサーバーサイドまでかなりがっつりコードを書いてました。</p>
+
+<p>中盤戦はリーダー業を他のメンバーにお願いして、アプリの改善のための開発に集中。</p>
+
+<p>後半戦は技術基盤チームという組織を立ち上げ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%EC%A5%A4%A5%F3%A5%B0%A5%DE%A5%CD%A1%BC%A5%B8%A5%E3%A1%BC">プレイングマネージャー</a>として、<a class="keyword" href="http://d.hatena.ne.jp/keyword/VM">VM</a>ベースで展開されていた各サービス郡の可用性、冗長性を高めるためAzureのマネージドサービスに移行していきました。</p>
+
+<p>SPAのフロントエンドから<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a> &amp; DB設計を含むサーバーサイド、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>サービスを使ったインフラ設計、開発チームのマネジメントという自分のオールラウンドな能力を生かした仕事が出来た一年かと思います。ただ前職自体に身につけた能力で戦った感があるので思い切り成長できたかというとそうでもない。</p>
+
+<p>来年はもっと挑戦していくぞ。</p>
+
+<ul>
+<li>ionicframeworkを使って既存の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Android">Android</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>アプリをリニューアル</li>
+<li>C2Cの商品売買<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A1%BC%A5%B1%A5%C3%A5%C8%A5%D7%A5%EC%A5%A4%A5%B9">マーケットプレイス</a>機能の設計・実装</li>
+<li>サービス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>によらない技術的課題を解決するための組織、技術基盤チームの立ち上げ</li>
+<li>テレビ放送に備えてコーポレートサイトをAzure <a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>で対策</li>
+<li>VirtualMachine上の<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>をAzure Database for <a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>に移行</li>
+<li>ファイルベースのキャッシュをAzure Redis Cacheを利用したキャッシュに移行</li>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%C9%A5%D0%A5%E9%A5%F3%A5%B5%A1%BC">ロードバランサー</a>をAzure Load Balancerから Application <a class="keyword" href="http://d.hatena.ne.jp/keyword/Gateway">Gateway</a>に移行</li>
+<li>複数<a class="keyword" href="http://d.hatena.ne.jp/keyword/VM">VM</a>へのデプロイを行うデプロイツールを作成</li>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/VM">VM</a>上にあったメディアサービスをAzure WebAppに移行</li>
+<li>Logic Appを使ってAzure上でモニタリングしているメトリクスの敷居値を超えたらSlackに通知するように構築</li>
+</ul>
+
+
+<h1>個人プロジェクト</h1>
+
+<p>今年は2つのソフトウェアを個人名義でリリースした。</p>
+
+<p>ひとつは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>で作った<a class="keyword" href="http://d.hatena.ne.jp/keyword/Web%A5%B5%A1%BC%A5%D3%A5%B9">Webサービス</a>でプロジェクト共有サービスのCollabo。</p>
+
+<p><blockquote class="twitter-tweet" data-lang="ja"><p lang="ja" dir="ltr">個人で開発している<a class="keyword" href="http://d.hatena.ne.jp/keyword/Web%A5%B5%A1%BC%A5%D3%A5%B9">Webサービス</a>「Collabo」をプレビュー版という形で先程公開しました😄<a href="https://t.co/Bz9qEBAa5T">https://t.co/Bz9qEBAa5T</a><br>「Collabo」は「ビジョン」と「イシュー(課題)」と「コミュニケーション」をオープンにして誰でもプロジェクトを公開、参加できるアプリですので、興味あればぜひ使ってみてください🙏</p>&mdash; UG (@arakaji) <a href="https://twitter.com/arakaji/status/1012131339674382337?ref_src=twsrc%5Etfw">2018年6月28日</a></blockquote><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script></p>
+
+<p>もうひとつは<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>製の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>ツールのMig。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=http%3A%2F%2Farakaji.hatenablog.com%2Fentry%2F2018%2F12%2F07%2F000527" title="Webフレームワークに依存しない、PHP製のシンプルなSQL マイグレーションツール「Mig」を作った。 - ゆーじのろぐ" class="embed-card embed-blogcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 190px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://arakaji.hatenablog.com/entry/2018/12/07/000527">arakaji.hatenablog.com</a></cite></p>
+
+<p>特別凄いソフトウェアでもないのだけど、僕的にはこの2つのソフトウェアは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DE">プログラマ</a>としての「初めて」を達成出来たソフトウェアなので感慨深い。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Web%A5%B5%A1%BC%A5%D3%A5%B9">Webサービス</a>を開発する<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DE">プログラマ</a>なので自分自身のオリジナルの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Web%A5%B5%A1%BC%A5%D3%A5%B9">Webサービス</a>を作ってみたかったが仕事が忙しいということを言い訳に実現できなかったのですが、このCollaboで初めて実現できました。</p>
+
+<p>Migは自分が作った<a class="keyword" href="http://d.hatena.ne.jp/keyword/OSS">OSS</a>で初めて<a class="keyword" href="http://d.hatena.ne.jp/keyword/GitHub">GitHub</a>のStarをもらったソフトウェアとなりました。</p>
+
+<p>来年は「フォロワーのInputが追いつかないほどのスピードでOutputを」をテーマにどんどんアウトプットとしてソフトウェアをリリースしていくのでもっと多くの「初めて」が達成出来ると嬉しい。</p>
+
+<h1>エンジニアコミュニティ活動</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%CF%A5%C3%A5%AB%A1%BC">ハッカー</a>ズチャンプルーの運営スタッフとして参加、Javakuecheの会長として2つの「<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B8%A5%E3%A5%A4%A5%EB">アジャイル</a>ジャパンサテライト沖縄」と「Javakueche day」の企画・運営を行いました。
+あと実験企画としてリモート<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A4%E2%A4%AF%A4%E2%A4%AF%B2%F1">もくもく会</a>という<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D3%A5%C7%A5%AA%A5%C1%A5%E3%A5%C3%A5%C8">ビデオチャット</a>を参加者でつないで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A4%E2%A4%AF%A4%E2%A4%AF%B2%F1">もくもく会</a>を行うという回も計9回ほど行いました(忙しくなってしまい、その後継続できなくなってしまい申し訳ない。。。)。前述したMigはリモート<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A4%E2%A4%AF%A4%E2%A4%AF%B2%F1">もくもく会</a>で実装したものなので個人的には成果はあった。もしやりたいという人がいればまた再開してもいいかも。</p>
+
+<p>ことしは運営は結構頑張ったんですが、自分で登壇したり他のコミュニティに参加するという機械がほとんどなかったのがちょっと残念だった。
+来年は県内はもちろん県外のコミュニティにも参加していくぞ。</p>
+
+<ul>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%CF%A5%C3%A5%AB%A1%BC">ハッカー</a>ズチャンプルーの運営参加</li>
+<li>リモート<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A4%E2%A4%AF%A4%E2%A4%AF%B2%F1">もくもく会</a>の開催</li>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B8%A5%E3%A5%A4%A5%EB">アジャイル</a>ジャパンサテライト沖縄を開催</li>
+<li>Javakueche dayを開催</li>
+</ul>
+
+
+<h1>その他大きな出来事</h1>
+
+<p>子供が1歳まで無事育ちました。
+子育ては圧倒的に時間を使うので自由に使える時間は減るのだけど、自分の人生の見方を大きく変えてくれました。</p>
+
+<p>今までは「自分が<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DE">プログラマ</a>として楽しく過ごすには」とか「自分が<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DE">プログラマ</a>として生きるための<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C0%B8%C2%B8%C0%EF%CE%AC">生存戦略</a>をどうするか」とかを大体長くても3年ぐらいのスパンでしか考えられなかったのですが、子供が生まれると「この子が生きる20年後のためにいま自分が何をすべきか」と考えるようになりました。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DE">プログラマ</a>としてもっと稼いだり成長するために<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EA%A1%BC%A5%E9%A5%F3%A5%B9">フリーランス</a>になるであったり東京の会社に転職するであったり考えることもあるのですが、僕も嫁も沖縄出身で沖縄に親もいることを考えると子育てするのは沖縄の方がいい。ただ東京や海外と比べると沖縄には先進的な人や文化、技術も少ないので先進的な教育を受ける機会も少なく子供の可能性を減らしてしまう。なら、沖縄を先進的な人が集まり文化、技術が生まれる場所にしてしまえばいい。そのために僕が<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DE">プログラマ</a>としていま出来ることのひとつとして沖縄初のスタートアップを世界的なテク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%CE%A5%ED">ノロ</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B8%A1%BC">ジー</a>カンパニーに成長させることにコミットすることを選択していたりする。</p>
+
+<p>あと、単純に子供はスーパー可愛い。</p>
+
+<h1>最後に</h1>
+
+<p>来年もさらにやっていくぞ。</p>
+
+<p>テーマは「フォロワーのInputが追いつかないほどのスピードでOutputを」</p>
+
+</div></section></main></body></html>

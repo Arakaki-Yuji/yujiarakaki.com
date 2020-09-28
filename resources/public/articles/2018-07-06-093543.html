@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">Collaboという個人プロダクトを公開して1週間たちました。</h1><div class="content">
+<p>いま個人プロダクトとしてCollaboという<a class="keyword" href="http://d.hatena.ne.jp/keyword/Web%A5%B5%A1%BC%A5%D3%A5%B9">Webサービス</a>を開発していて、プレビュー版として6月28日に公開しました。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fwww.collabo.fun%2F" title="Collabo" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://www.collabo.fun/">www.collabo.fun</a></cite></p>
+
+<h1>Collaboとは？</h1>
+
+<p>このサービスを一言で表すと「プロジェクト共有サービス」です。</p>
+
+<p>自分のプロジェクトを立ち上げ、そのビジョンを共有し、イシュー(課題)を共有して、オープンな場でコミュニケーションを取りながらプロジェクトを進めていけるサービスです。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DE%A1%BC">プログラマー</a>のコミュニティでは「<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AA%A1%BC%A5%D7%A5%F3%A5%BD%A1%BC%A5%B9">オープンソース</a>」という文化があって、ソフトウェアの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>をオープンに共有することで誰でもその開発プロジェクトに参加でき、それによって様々なソフトウェアが生まれ進化し、現代のテク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%CE%A5%ED">ノロ</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B8%A1%BC">ジー</a>を支えています。</p>
+
+<p>僕が持っていた仮説は、「<a class="keyword" href="http://d.hatena.ne.jp/keyword/OSS">OSS</a>のように個人や団体、企業が持っているプロジェクト自体をオープンにすることでより多くの多様なプロジェクトが生まれ、そこから多くの成功するプロジェクトも増えるのではないか？」というものです。</p>
+
+<p>その仮説を証明するためにこのプロダクトを公開し、現在も開発しています。</p>
+
+<h1>1週間たった現状報告</h1>
+
+<p>プレビュー版を公開して1週間たった現状はこんな感じです。</p>
+
+<p>ユーザー数: 8
+プロジェクト数: 3
+コメント数: 15</p>
+
+<p>正直現状はサー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D3%A5%B9%A5%B3">ビスコ</a>ンセプト自体への興味というより、顔見知りが僕の作ったものに興味があって見てもらっている状態ですw</p>
+
+<p>また、「ログインできない！！」という致命的なバグも報告されました^^;</p>
+
+<p>現状復旧したのですが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%CF%A5%C3%A5%AB%A1%BC">ハッカー</a>ズチャンプルーのある日までには公開したいということでデバック足りない状態で「エイヤ！」でリリースしたので、案の定根本的な問題を見過ごしていました。。。反省です>&lt;</p>
+
+<h1>今後の動きについて</h1>
+
+<p>長期的にあーしたい、こーしたいというのはたくさんあるのですが、現在は仕事しながらのサイドプロジェクトですのでそこまでリソースは費やせません。</p>
+
+<p>なので以下の1点だけを基本方針と定めて進めていきます。</p>
+
+<ul>
+<li>KPIであるコメント数の成長率(既存コメント数対する新規のコメント数の割合)を毎週1%超えることを目指して意思決定・行動する</li>
+</ul>
+
+
+<p>KPIとしてユーザー数やプロジェクト数ではなく、コメント数を定めた理由は、それがもっとも既存ユーザーの利用頻度の多い機能のためです。</p>
+
+<p>ユーザー数やプロジェクト数は、その気になれば広告を回したり<a class="keyword" href="http://d.hatena.ne.jp/keyword/SNS">SNS</a>でバズらせることで一時的に増やすことは可能ですが、コメント数は実際にサービスが意図どおりに利用されていないと増えない数字なのでこちらをKPIに設定しました。</p>
+
+<p>ちなみに今日時点のコメント数が15のため、来週までに一つでも新規のコメントがあれば6%の成長率という大幅に目標を超過して達成です！やったね！！</p>
+
+<h1>7月中に実装予定の機能</h1>
+
+<p>とりあえず以下の機能・改修を優先して開発する予定です。</p>
+
+<ul>
+<li>プロジェクトに更新(Issueの追加、コメントなど)があったときの通知機能(メール、Slack連携)</li>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%DE%A5%DB">スマホ</a>対応のデザイン</li>
+<li>ノート機能(Issueは課題を共有してコミュニケーションする機能だが、ノートはプロジェクトに関連する情報などを書いてためておき、あとから見直すためのストック情報のための機能)</li>
+</ul>
+
+
+<p>もしこういう修正がしてほしい、こんな機能がほしい、Collaboを使ってもらうためにこういう施策をうったらどうだ？ など思いつきましたら、CollaboのIssueに投稿していただけると<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%BF%B4%EE">歓喜</a>して対応しますのでよろしくお願いしますm(_ _ ;)m</p>
+
+<p><a href="https://www.collabo.fun/projects/1?tab=issues">https://www.collabo.fun/projects/1?tab=issues</a></p>
+
+</div></section></main></body></html>

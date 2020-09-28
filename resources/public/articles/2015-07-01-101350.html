@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">Roswellで使ってみる</h1><div class="content">
+<p>色んな<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0%B8%C0%B8%EC">プログラミング言語</a>を遊びで触ることが多いのですが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Common%20Lisp">Common Lisp</a>もやっています。</p>
+
+<p>日本で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Common%20Lisp">Common Lisp</a>とういうと<a href="http://blog.8arrow.org/">八発白中</a>というブログですが、そこで紹介されていた<a href="https://github.com/snmsts/roswell">Roswell</a>というプロダクトを使ってみました。</p>
+
+<h1>インストール</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac%20OS">Mac OS</a>なら<a class="keyword" href="http://d.hatena.ne.jp/keyword/brew">brew</a>でインストールできるらしい。</p>
+
+<pre class="code" data-lang="" data-unlink>$ brew tap snmts/roswell
+$ brew install roswell
+</pre>
+
+
+<h1>処理系をインストール</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a> でいうrbenvのように処理系をバージョン指定してインストール可能らしい。
+とりあえずいまはバージョンどうでもいいので処理系のみ指定してインストールする。</p>
+
+<pre class="code" data-lang="" data-unlink>$ ros install sbcl</pre>
+
+
+<h1>Repl起動</h1>
+
+<p>ros run コマンドでreplが起動出来る。</p>
+
+<pre class="code" data-lang="" data-unlink>$ ros run 
+* (+ 1 2 3)
+
+6</pre>
+
+
+<h1>雑感</h1>
+
+<p>CommonLispを始めるときに処理系をインストールするのは結構面倒だったので、こういう<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>はありがたいです。
+(まあ、いうほど<a class="keyword" href="http://d.hatena.ne.jp/keyword/Lisp">Lisp</a>書いてないけど・・</p>
+
+</div></section></main></body></html>

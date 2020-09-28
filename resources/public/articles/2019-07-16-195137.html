@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">Azure Queue StorageをバックエンドにしたPHP製のジョブキューライブラリ「Backjob」を作った</h1><div class="content">
+<p>AzureにはQueue Storageというマネージドサービスがあるのですが、そのQueueStorageをバックエンドとして利用した<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>製のジョブキューライブラリを作りました。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fgithub.com%2FArakaki-Yuji%2Fbackjob" title="Arakaki-Yuji/backjob" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://github.com/Arakaki-Yuji/backjob">github.com</a></cite></p>
+
+<h1>なぜ作ったのか？</h1>
+
+<p>今自分の会社で作っているプロダクトの特性がWrite Heavyなアプリケーションになっており、ユーザーがプッシュ通知などで大量アクセスするとWebApp側はスケールできても<a class="keyword" href="http://d.hatena.ne.jp/keyword/RDB">RDB</a>側がスケールできないという課題がありました。</p>
+
+<p>それに加えて、2年程まえに自分達で自作していたジョブキューシステムがあったのですがそれがアプリケーションで使っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/RDB">RDB</a>をそのままバックエンドとして使用しており、その性能限界により「ジョブ登録が大量に来るとロック待ちが発生し障害の元となる」、「ジョブが詰まったときにワーカーを増やして処理性能をあげたいが<a class="keyword" href="http://d.hatena.ne.jp/keyword/RDB">RDB</a>のパフォーマンスネックによリこれ以上ワーカーを増やせない」という問題もありました。</p>
+
+<p>その課題を解決するために、<a class="keyword" href="http://d.hatena.ne.jp/keyword/RDB">RDB</a>ではなくAzure Queue Storageを用いたジョブキューライブラリを作り、ユーザーからのリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トで直接<a class="keyword" href="http://d.hatena.ne.jp/keyword/RDB">RDB</a>に書き込みをするのではなく新しいジョブキュー経由で書き込みをするように変更することでDB負荷の軽減と既存ジョブキューライブラリの課題を解決させたいと考えました。</p>
+
+<p>ここでLaravelなどのモダンな<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>を使っていれば標準なジョブキューライブラリがあると思いますが、私達が利用する<a class="keyword" href="http://d.hatena.ne.jp/keyword/FuelPHP">FuelPHP</a>にはそのようなものがなく、また他の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>で利用されるジョブキューライブラリをみてもRedisや<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>のSQSに対応していてもAzureのQueue Storageには対応していない状況だったため自分で作りました。</p>
+
+<h1>インストール</h1>
+
+<p>composer でインストールできるように公開しているので、以下の内容をプロジェクトのcomposer.<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>に追記してください。</p>
+
+<pre class="code :php" data-lang=":php" data-unlink>{
+    &#34;require&#34;: {
+        &#34;arakaki-yuji/backjob&#34;: &#34;^0.0.5&#34;
+    }
+}</pre>
+
+
+<h1>使い方</h1>
+
+<h2>自分のJobを定義する</h2>
+
+<p>以下のように\Backjob\Jobクラスを継承して自分の独自Jobを定義します。</p>
+
+<pre class="code :php" data-lang=":php" data-unlink>class CustomJob extends \Backjob\Job
+{
+    /**
+     * You must define a run method.
+     * this method is called when dequeued and run
+     */
+    public function run()
+    {
+        $msg = $this-&gt;params[&#39;message&#39;];
+        return $msg;
+    }
+    
+    /**
+     * this method is optional.
+     * if you define success method, it is called after run method successed.
+     */
+    public function success()
+    {
+        return &#39;success job&#39;;
+    }
+    
+     /**
+     * this method is optional.
+     * if you define fail method, it is called after run method failed.
+     */
+    public function fail()
+    {
+        return &#39;success job&#39;;
+    }
+}</pre>
+
+
+<p>runメソッドはJobが実行されるときに呼ばれるメソッドです。このrunメソッドの中でこのJobが実行したいタスクの実装を書いていきます。
+Jobを登録するときにパラメータが渡せるようになっているのですが、そのパラメータは$this->paramsの中に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CF%A2%C1%DB%C7%DB%CE%F3">連想配列</a>で入っています。
+このrunメソッドは必ず定義してください。</p>
+
+<p>failメソッドとsuccessメソッドは実装してもしなくても構いません。</p>
+
+<p>successメソッドはrunメソッドが正常に実行されたあとに呼ばれるメソッドです。</p>
+
+<p>failメソッドはrunメソッド内で例外やエラーが発生したときに呼ばれるメソッドです。</p>
+
+<p>それぞれ自分たちのアプリケーションの要件に合わせて利用してください。</p>
+
+<h2>Jobの登録、そして登録されたジョブの実行の仕方</h2>
+
+<p>キューへのジョブの登録、そしてキューからジョブを取り出して実行するために利用するBackjobクラスの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>を作ります。</p>
+
+<p>引数にはQueue Storageのストレージアカウント名、Queue Storageの名前、ストレージアカウントのアクセスキーを与えます。</p>
+
+<pre class="code :php" data-lang=":php" data-unlink>$backjob = new \Backjob\Backjob::factory($storageAccountName, $queueName, $accessKey);
+</pre>
+
+
+<p>ジョブをキューストレージに登録するには、登録したいジョブのクラスメソッド makeJobメソッドに引数としてジョブに渡したいパラメータを<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CF%A2%C1%DB%C7%DB%CE%F3">連想配列</a>で渡し、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>化します。</p>
+
+<p>その後、Backjob<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>メソッド、queueの引数としてジョブを渡して上げればジョブキューへの登録が完了します。</p>
+
+<pre class="code" data-lang="" data-unlink>$params = [&#39;message&#39; =&gt; &#39;Hello Backjob&#39;];
+$job = CustomeJob::makeJob($params);
+$backjob-&gt;queue($job);</pre>
+
+
+<p>ジョブキューに登録されたジョブを実行するには、Backjob<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>のrunメソッドを実行します。
+runメソッドを実行すると、ジョブキューからひとつのジョブを取り出し、そのジョブをrunメソッドを実行して処理を行います。</p>
+
+<pre class="code :php" data-lang=":php" data-unlink>$backjob = new \Backjob\Backjob::factory($storageAccountName, $queueName, $accessKey);
+$backjob-&gt;run(); // =&gt; &#39;Hello Backjob&#39;</pre>
+
+
+<p>このrunメソッドをcronで叩く、もしくは<a class="keyword" href="http://d.hatena.ne.jp/keyword/daemon">daemon</a>化してループで呼び続けるコードをそれぞれ使っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>の流儀に沿って作っていただければOKです。</p>
+
+<h1>今後について</h1>
+
+<p>自分達のプロダクトに必要だったから作ったライブラリなので、今後も必要に応じてアップデートはしていく予定です。</p>
+
+<p>いま考えている範囲だと、Azure Queue Storageの性能限界を超えた量のジョブを処理する必要になった場合にバックエンドに用意するQueue Storageを複数設定できるようにして負荷分散に対応する、またqueueへの登録が失敗したときのretry回数やtimeoutの設定できるようにするなどはやりたいと考えています。</p>
+
+<p>とりあえず現時点で一週間で40万件以上のジョブを処理しているので、ちゃんと使えると思います。</p>
+
+</div></section></main></body></html>

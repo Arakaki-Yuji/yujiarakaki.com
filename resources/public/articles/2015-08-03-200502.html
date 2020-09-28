@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">RackサーバーのPumaについて調べてみる</h1><div class="content">
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="http://cdn-ak.f.st-hatena.com/images/fotolife/a/arakaji-yuu/20150803/20150803143727.png" alt="f:id:arakaji-yuu:20150803143727p:plain" title="f:id:arakaji-yuu:20150803143727p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<h1>はじめに</h1>
+
+<p>いま開発中の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>アプリケーションのRackサーバーは最初<a class="keyword" href="http://d.hatena.ne.jp/keyword/Unicorn">Unicorn</a>を使っていたのですが、諸々の事情でPumaの方を使いたいということになった。
+まだリリースもしていないのでやるなら早めに変えちゃおうということでPumaについて調べてみた。</p>
+
+<h1>Pumaとは</h1>
+
+<p>Pumaとはスピードと並列性を追求した<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>のWebサーバーです。
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>でWebサーバーを作るときの標準となっているRackに対応したライブラリになっています。</p>
+
+<h2>スレッドベースのWebサーバー</h2>
+
+<p>Pumaではリクエストの並列処理を実現するためにスレッドを利用しています。
+リクエストを処理するためのスレッドを予めスレッドプールに指定した数だけ用意しておきます。リクエストが来るとそのスレッドに処理を任せることでスレッドベースの並列処理を行っています。</p>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>の処理系について</h2>
+
+<p>Pumaではスレッド用いるため、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>の処理系はRubinusや<a class="keyword" href="http://d.hatena.ne.jp/keyword/JRuby">JRuby</a>を推奨していますが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/MRI">MRI</a>(<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>標準の処理系)でも利用することが可能です。</p>
+
+<h3><a class="keyword" href="http://d.hatena.ne.jp/keyword/MRI">MRI</a>におけるスレッドの扱い</h3>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/MRI">MRI</a>でのスレッドはGlobal <a class="keyword" href="http://d.hatena.ne.jp/keyword/Interpreter">Interpreter</a> Lockという機能によって利用が制限されています。
+Global <a class="keyword" href="http://d.hatena.ne.jp/keyword/Interpreter">Interpreter</a> Lockとは「同時には一つのスレッドしか動かないようにする」というものです。</p>
+
+<p>たとえばRubiusのようにスレッドによる並列処理をサポートしている処理系では3つのスレッドを立ち上げて処理を行った場合、同時に処理をおこないます。
+ただし<a class="keyword" href="http://d.hatena.ne.jp/keyword/MRI">MRI</a>はGlobal <a class="keyword" href="http://d.hatena.ne.jp/keyword/Interpreter">Interpreter</a> Lockのよって3つのスレッドを立ち上げて処理を行っても一度に一つのスレッドしか処理をおこないません。1つのスレッドが処理をおこなっている最中にBlocking IO(ファイルやの書き込みやTwitterAPIを叩くなど)によって待ち時間が発生したタイミングで別スレッドに切り替えて処理を進めます。</p>
+
+<h1>使い方</h1>
+
+<h2>起動</h2>
+
+<p>Pumaを起動する場合、以下のコマンドを実行します。</p>
+
+<pre class="code" data-lang="" data-unlink>$ bundle exec puma</pre>
+
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/rails">rails</a>の場合、以下のコマンドでも実行可能です。</p>
+
+<pre class="code" data-lang="" data-unlink>$ bundle exec rails s Puma</pre>
+
+
+<p>もしサーバーをデーモンとして実行したい場合は<code>-d</code>オプションを付けましょう</p>
+
+<pre class="code" data-lang="" data-unlink>$ bundle exec puma -d</pre>
+
+
+<p>設定ファイルを指定する場合は<code>-C</code>オプションのあとに設定ファイルへのパスを指定します。</p>
+
+<pre class="code" data-lang="" data-unlink>$ bundle exec puma -C config/puma.rb</pre>
+
+
+<h2>停止</h2>
+
+<p>Pumaを停止するにはプロセスに対して<code>QUIT</code>シグナルを送ります。
+<code>rails s Puma</code>で起動した場合のデフォルトのpidファイルは<code>tmp/pids/server.pid</code>にありますので、そこに記載されているプロセスIDに対してシグナルを送信します</p>
+
+<pre class="code" data-lang="" data-unlink>$ kill -QUIT `(cat tmp/pids/server.pid)`</pre>
+
+
+<p>設定ファイルconfig/puma.rbを指定して起動した場合、その設定ファイルから*.pidファイルを探せるので<code>pumactl</code>というコマンドを使って簡単に停止することもできます。</p>
+
+<pre class="code" data-lang="" data-unlink>$ bundle exec pumactl halt</pre>
+
+
+<h2>再起動</h2>
+
+<p>Pumaの再起動はhot restartに対応しています。
+hot restartとはnginxや<a class="keyword" href="http://d.hatena.ne.jp/keyword/unicorn">unicorn</a>と同様にサーバーのソケットを開いたままリスタートすることを可能にします。それにより、ユーザーからのリクエストを待たせる事なくサーバーを再起動して新しいバージョンのアプリケーションに切り替える事ができます。</p>
+
+<p>hot restartするにはpumaのプロセスに対して<code>SIGUSR2</code>シグナルを送信します。</p>
+
+<pre class="code" data-lang="" data-unlink>$ kill -SIGUSR2 `(cat tmp/pids/server.pid)`</pre>
+
+
+<p>設定ファイルを指定した実行した場合、pumactlで再起動をかけることも出来ます。</p>
+
+<pre class="code" data-lang="" data-unlink>$ bundle exec pumactl restart</pre>
+
+
+<h1>設定ファイル</h1>
+
+<p>puma起動時のオプションの指定である程度カスタマイズできるがやはり設定ファイルに書いて起動する方が管理しやすいです。
+pumaの設定ファイルでなにをどう設定できるかまとめておきます。</p>
+
+<p>ちなみに設定ファイルのサンプルはpumaの<a class="keyword" href="http://d.hatena.ne.jp/keyword/github">github</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>の<a href="https://github.com/puma/puma/blob/master/examples/config.rb">puma/examples/config.rb</a>から手に入ります。</p>
+
+<h2>environment</h2>
+
+<p>pumaをどの環境で動作させるかを指定します。デフォルトは'development'になっています。
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/rails">rails</a>で使う場合は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/RAILS">RAILS</a>_ENVを直接environmentに指定するのが良いと想います。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink><span class="synComment"># Set the environment in which the rack's app will run. The value must be a string</span>
+<span class="synComment">#</span>
+<span class="synComment"># The default is &quot;development&quot;.</span>
+<span class="synComment">#</span>
+<span class="synComment"># environment 'production'</span>
+environment <span class="synIdentifier">ENV</span>[<span class="synSpecial">'</span><span class="synConstant">RAILS_ENV</span><span class="synSpecial">'</span>] <span class="synComment"># Railsで使う場合</span>
+</pre>
+
+
+<h2>daemonize</h2>
+
+<p>rackサーバーをデーモンにして起動するかどうかを設定します。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink><span class="synComment"># Daemonize the server into the background. Highly suggest that</span>
+<span class="synComment"># this be combined with &quot;pidfile&quot; and &quot;stdout_redirect&quot;.</span>
+<span class="synComment">#</span>
+<span class="synComment"># The default is &quot;false&quot;.</span>
+<span class="synComment">#</span>
+<span class="synComment"># daemonize</span>
+<span class="synComment"># daemonize false</span>
+daemonize <span class="synConstant">true</span>
+</pre>
+
+
+<h2>pidfile</h2>
+
+<p>pidファイルを配置するパスを指定します。
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>の場合、tmp/pids/puma.pidに配置するほうが良いと思います。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink><span class="synComment"># Store the pid of the server in the file at &quot;path&quot;.</span>
+<span class="synComment">#</span>
+<span class="synComment"># pidfile '/u/apps/lolcat/tmp/pids/puma.pid'</span>
+pidfile <span class="synSpecial">&quot;#{</span><span class="synType">Dir</span>.pwd<span class="synSpecial">}</span><span class="synConstant">/tmp/pids/puma.pid</span><span class="synSpecial">&quot;</span>
+</pre>
+
+
+<h2>state_path</h2>
+
+<p>サーバー情報を記載したstateファイルを配置するパスを指定します。
+stateファイルはpumactlコマンドでサーバーを操作するのに使用します。
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/rails">rails</a>の場合、特別このようなファイルを配置するディレクトリはないので今回はtmp/pids/以下に配置しておきます。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink><span class="synComment"># Use &quot;path&quot; as the file to store the server info state. This is</span>
+<span class="synComment"># used by &quot;pumactl&quot; to query and control the server.</span>
+<span class="synComment">#</span>
+<span class="synComment"># state_path '/u/apps/lolcat/tmp/pids/puma.state'</span>
+state_path <span class="synSpecial">&quot;#{</span><span class="synType">Dir</span>.pwd<span class="synSpecial">}</span><span class="synConstant">/tmp/pids/puma.state</span><span class="synSpecial">&quot;</span>
+</pre>
+
+
+<h2>Cluster mode</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%B9%A5%BF">クラスタ</a>モードとは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>のワー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AB%A1%BC%A5%D7">カープ</a>ロセスを起動し、そのプロセスそれぞれでスレッドプールを持ちリクエストを処理する仕組みです。
+ワー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AB%A1%BC%A5%D7">カープ</a>ロセスの数は以下のように指定します。
+Workerの数をマシンが持つCore数を超えないように気をつけて下さい。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink>
+<span class="synComment"># === Cluster mode ===</span>
+<span class="synComment"># How many worker processes to run.</span>
+<span class="synComment">#</span>
+<span class="synComment"># The default is &quot;0&quot;.</span>
+<span class="synComment">#</span>
+workers <span class="synConstant">2</span>
+</pre>
+
+
+<h2>Thread Pool</h2>
+
+<p>Pumaはスレッドによってリクエストを処理します。スレッドをスレッドプールに貯めておく数の下限から上限を指定することが出来ます。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink><span class="synComment"># Configure &quot;min&quot; to be the minimum number of threads to use to answer</span>
+<span class="synComment"># requests and &quot;max&quot; the maximum.</span>
+<span class="synComment">#</span>
+<span class="synComment"># The default is &quot;0, 16&quot;.</span>
+<span class="synComment">#</span>
+<span class="synComment"># threads 0, 16</span>
+threads <span class="synConstant">16</span>, <span class="synConstant">16</span>
+</pre>
+
+
+<h2>bind</h2>
+
+<p>サーバーをどのように接続するかを<a class="keyword" href="http://d.hatena.ne.jp/keyword/URI">URI</a>で指定できます。
+シンプルに<a class="keyword" href="http://d.hatena.ne.jp/keyword/TCP">TCP</a>で接続する場合<code>tcp://0.0.0.0:80</code>、またWebサーバーの前段にnginxをなどを置き、そこから<a class="keyword" href="http://d.hatena.ne.jp/keyword/UNIX">UNIX</a> Socket経由で接続する場合は<code>unix:///var/run/puma.sock</code>のように指定します。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink><span class="synComment"># Bind the server to &quot;url&quot;. &quot;tcp://&quot;, &quot;unix://&quot; and &quot;ssl://&quot; are the only</span>
+<span class="synComment"># accepted protocols.</span>
+<span class="synComment">#</span>
+<span class="synComment"># The default is &quot;tcp://0.0.0.0:9292&quot;.</span>
+<span class="synComment">#</span>
+<span class="synComment"># bind 'tcp://0.0.0.0:9292'</span>
+<span class="synComment"># bind 'unix:///var/run/puma.sock'</span>
+<span class="synComment"># bind 'unix:///var/run/puma.sock?umask=0111'</span>
+<span class="synComment"># bind 'ssl://127.0.0.1:9292?key=path_to_key&amp;cert=path_to_cert'</span>
+bind <span class="synSpecial">'</span><span class="synConstant">unix:///var/share/sockets/puma.sock</span><span class="synSpecial">'</span>
+</pre>
+
+
+<h2>その他、なにが設定可能か調べるには</h2>
+
+<p>上記で指定したこと以外にも設定可能な項目はあります。
+それを調べるには<a href="https://github.com/puma/puma/blob/master/examples/config.rb">設定ファイルのサンプル</a>か、設定ファイルの<a href="https://github.com/puma/puma/blob/master/lib/puma/dsl.rb">DSLが定義されたファイル</a>を読んで探してみると大体何ができるか把握出来ます。</p>
+
+<h1>参考URL</h1>
+
+<p><a href="https://github.com/puma/puma">https://github.com/puma/puma</a></p>
+
+</div></section></main></body></html>

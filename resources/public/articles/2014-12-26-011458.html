@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">APIファーストでバックエンドとフロントエンドを別々に開発する時にハマるクロスドメインアクセス</h1><div class="content">
+<p>いま個人で開発を行っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/Web%A5%B5%A1%BC%A5%D3%A5%B9">Webサービス</a>がありまして、そこではバックエンドをRubyonRails、フロントエンドを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a> &amp; ClojureScriptで開発し、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>でお互いやりとりするように設計しています。(その設計した理由は色々ありますが、単純に好きな2つの言語を使いたかったのが大きな理由の一つですw)</p>
+
+<p>おそらくこれからのアプリケーション開発において、このようにフロントエンドとバックエンドをサーバーも言語も分けて設計・開発することが多くなると思いますので、最近ハマった問題をシェアしておきます。</p>
+
+<h2>同一生成元ポリシー(Same Origin Policy)</h2>
+
+<p>そのハマった問題というのが同一生成元ポリシーによる<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>の規制です。</p>
+
+<p>同一生成元ポリシーとは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>Aに配置されているHTMLファイルから別<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>Bのサーバーの<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>で通信することが出来ないという制約です。</p>
+
+<p>この制約があることで、例えば開発中にフロントエンドを<a class="keyword" href="http://d.hatena.ne.jp/keyword/localhost">localhost</a>:8000で起動し、バックエンドを<a class="keyword" href="http://d.hatena.ne.jp/keyword/localhost">localhost</a>:8001で起動して<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>通信しようとするとエラーが発生してしまいます。</p>
+
+<p>では、フロントエンドから別サーバーの<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>と通信するにはどうすればいいのか・・</p>
+
+<h2>CORS(Cross-Origin Resource Sharing)</h2>
+
+<p>実はこういう希望に対処するためにCross-Origin Resource Sharingという、<a class="keyword" href="http://d.hatena.ne.jp/keyword/XMLHttpRequest">XMLHttpRequest</a>(<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>のことです)でクロス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>アクセスを実現する仕様を<a class="keyword" href="http://d.hatena.ne.jp/keyword/W3C">W3C</a>勧告で各ブラウザが実装しています。</p>
+
+<p>CORSではクロス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>アクセスを行うクライアント側とアクセスされるサーバー側の振る舞いが仕様で規定されています。</p>
+
+<p>その概要はブラウザとサーバーがHTTPヘッダを使ってアクセス制御に関する情報をやりとりしてアクセスを行うものです。</p>
+
+<p>CORSを実際に行う場合にクライアント側のJSで特別な制御を行う必要はあまりないのですが、サーバー側で以下のようなアクセス制限に関するルールを設定する必要があります。</p>
+
+<ul>
+<li>クロス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>アクセスを許可するWebページの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a></li>
+<li>使用を許可するHTTP<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BD%A5%C3%A5%C9">メソッド</a></li>
+<li>使用を許可するHTTPヘッダ</li>
+</ul>
+
+
+<p>では、これからどのようにCORSを行っているかを説明していきます。</p>
+
+<h3>CORSの動作 - クライアント側</h3>
+
+<p>クライアント側がクロス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>アクセスを行うときに行う通信手段には2パターンあります。</p>
+
+<ul>
+<li>直接クロス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>のリソースへリクエストを送る</li>
+<li>クロス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>アクセスが出来るか確認するリクエスト(preflightリクエスト)を送り、そのレスポンスを受けたあとに改めてリクエストを送信する。</li>
+</ul>
+
+
+<p>以下に記載する条件にすべて該当する場合はpreflightリクエストを送る必要がないと判断して、直接サーバーにリクエストを送信します。逆にいうと、この条件に合わなければ必ずpreflightリクエストを送るということです。(これらの判断はすべてブラウザが行ってくれるのでクライアント側で特別にコードを書く必要はありません。)</p>
+
+<h4>preflightリクエストを送信しない条件</h4>
+
+<ul>
+<li>HTTP<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BD%A5%C3%A5%C9">メソッド</a>がGET, POST, HEADのどれか</li>
+<li>HTTPヘッダにAccept, Accept-Language, Content-Language, Content-Type以外のフィールドが含まれていない</li>
+<li>Content-Typeの値がapplication/x-www-form-urlencoded, multipart/form-data, text/plainのいずれか</li>
+</ul>
+
+
+<p>上記の条件をみて頂けると気づくと思いますが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>でデータをやりとりするときは<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>や<a class="keyword" href="http://d.hatena.ne.jp/keyword/xml">xml</a>をフォーマットとして使うことが多いので、大半はまず間違いなくpreflightリクエストが送られるということです。^^;</p>
+
+<h3>CORSの動作 - サーバー側</h3>
+
+<h4>Originのチェック</h4>
+
+<p>サーバー側では、まず受け取ったリクエストがクロス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>から受け取ったリクエストか判断するためにリクエストヘッダに含まれる<strong>Origin</strong>フィールドの値が入っているかチェックします。</p>
+
+<p>Originフィールドに値が入っていれば、その<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>がCORSを許可した<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>かをチェックして受け入れるか否かを判断します。</p>
+
+<h4>preflightリクエストかどうかを判断する</h4>
+
+<p>次にサーバーはこのリクエストが通常のリクエストかpreflightリクエストかを判断しないといけません。実際には以下の項目をチェックしてpreflightかどうかを判断します。</p>
+
+<ul>
+<li>HTTP<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BD%A5%C3%A5%C9">メソッド</a>がOPTIONSであるか</li>
+<li>リクエストヘッダに<a class="keyword" href="http://d.hatena.ne.jp/keyword/Access">Access</a>-Control-Request-Methodフィールドが付与されているか</li>
+</ul>
+
+
+<p>ちなみに、僕はクロス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>でエラーが発生したリクエストを調査しているときに、POSTで送ったはずのHTTP<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BD%A5%C3%A5%C9">メソッド</a>がOPTIONSになっていて思わずライブラリのバグかなと中のコードを30分程探ってしまいました(- -;)</p>
+
+<h4>アクセス許可<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BD%A5%C3%A5%C9">メソッド</a>のチェック</h4>
+
+<p>続いて、HTTP<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BD%A5%C3%A5%C9">メソッド</a>がアクセスを許可しているものかどうかをチェックします。</p>
+
+<p>preflightリクエストが来ていた場合、<strong><a class="keyword" href="http://d.hatena.ne.jp/keyword/Access">Access</a>-Control-Request-Method</strong>に本来送るはずのHTTP<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BD%A5%C3%A5%C9">メソッド</a>がここに記載されているので、この中身もみてアクセスを許可するかどうかを判断します。</p>
+
+<h4>レスポンスヘッダの作成</h4>
+
+<h5><a class="keyword" href="http://d.hatena.ne.jp/keyword/Access">Access</a>-Control-Allow-Origin</h5>
+
+<p>CORSが成立して、リクエストに対してレスポンスを返す時にレスポンスヘッダの<strong><a class="keyword" href="http://d.hatena.ne.jp/keyword/Access">Access</a>-Control-Allow-Origin</strong>フィールドにクロス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>アクセスが許可される<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>名を付加します。</p>
+
+<p>もし<a class="keyword" href="http://d.hatena.ne.jp/keyword/Access">Access</a>-Control-Allow-Originのフィールドがない場合はブラウザはクロス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>アクセスに失敗したと判断してエラーを発生させます。</p>
+
+<p>リクエストがpreflightリクエストだった場合は他にもレスポンスヘッダを追加します。</p>
+
+<h5><a class="keyword" href="http://d.hatena.ne.jp/keyword/Access">Access</a>-Control-Allow-Methods</h5>
+
+<p>preflight後の実際のリクエストで利用を許可するHTTP<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BD%A5%C3%A5%C9">メソッド</a>の情報を付加します。</p>
+
+<h5><a class="keyword" href="http://d.hatena.ne.jp/keyword/Access">Access</a>-Control-Allow-Headers</h5>
+
+<p>preflights後の実際のリクエストで利用を許可するリクエストヘッダの情報を付加します。</p>
+
+<h5><a class="keyword" href="http://d.hatena.ne.jp/keyword/Access">Access</a>-Control-Max-Age</h5>
+
+<p>preflightの結果をキャッシュする時間を付加します。毎回毎回クロス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>アクセスを行うたびにpreflightリクエストを送ると送受信コストが無駄にかかってしまうため、こちらで指定した時間はその結果をキャッシュしブラウザ側はpreflightリクエストを送らずに直接リクエストを送信します。単位は秒で指定します。</p>
+
+<h2>理屈は分かった。で、どうすればいいんだ！？</h2>
+
+<p>上の説明でCORSを行う仕組みはなんとなく把握できたと思うのですが、じゃあ具体的にどういう対応すればいいのでしょうか？</p>
+
+<p>自分の場合はバックエンド側にはRubyonRailsを使っており、幸いCORS対応を行うためのgemで<a href="https://github.com/cyu/rack-cors">rack-cors</a>というのがすでにあるのでそちらを使いました。</p>
+
+<p>rack-corsのREADMEを見れば良いのですが、Gemfileにrack-corsを追記してbundle installしたあとに、config/application.rbに以下のように記載します。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink><span class="synPreProc">module</span> <span class="synType">YourApp</span>
+  <span class="synPreProc">class</span> <span class="synType">Application</span> &lt; <span class="synType">Rails</span>::<span class="synType">Application</span>
+
+    <span class="synComment"># ...</span>
+
+    config.middleware.insert_before <span class="synConstant">0</span>, <span class="synSpecial">&quot;</span><span class="synConstant">Rack::Cors</span><span class="synSpecial">&quot;</span> <span class="synStatement">do</span>
+      allow <span class="synStatement">do</span>
+        origins <span class="synSpecial">'</span><span class="synConstant">your_app_domain</span><span class="synSpecial">'</span>
+        resource <span class="synSpecial">'</span><span class="synConstant">*</span><span class="synSpecial">'</span>, <span class="synConstant">:headers</span> =&gt; <span class="synConstant">:any</span>, <span class="synConstant">:methods</span> =&gt; [<span class="synConstant">:get</span>, <span class="synConstant">:post</span>, <span class="synConstant">:put</span>, <span class="synConstant">:delete</span>, <span class="synConstant">:options</span>]
+      <span class="synStatement">end</span>
+    <span class="synStatement">end</span>
+
+  <span class="synPreProc">end</span>
+<span class="synPreProc">end</span>
+</pre>
+
+
+</div></section></main></body></html>

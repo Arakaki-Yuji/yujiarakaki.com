@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">Facebookが提唱するアーキテクチャ、FLUXとは単一方向のデータフローを実現するためのもの</h1><div class="content">
+<h1>FLUXとは ~ 概要 ~</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Facebook">Facebook</a>が提唱している、UIを構築するためのアプリケーション<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>です。
+Reactと一緒に語られることが多いですが、FLUXは特定のツールに依存した<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>ではなく<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>のパターンの一つなのでReactを使わなくても実装可能です。</p>
+
+<p> <span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/a/arakaji-yuu/20190109/20190109095108.png" alt="f:id:arakaji-yuu:20190109095108p:plain" title="f:id:arakaji-yuu:20190109095108p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p>FLUXの特徴は、Action → Dispacher → Store → View と単一方向のデータフローによってUI設計をしていることです。
+これによりデータフローによる複雑性をへらし、コードの可読性や堅牢性を高めています。</p>
+
+<h1>従来の手法とはなにが違うの？</h1>
+
+<p>よく比較される<a class="keyword" href="http://d.hatena.ne.jp/keyword/MVC">MVC</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>との違いは、データフローを単一方向に限定したこと。
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/MVC">MVC</a>のControllerとModelは複数のモデルとControllerが相互にデータをやり取りすることで状態を把握することが困難なりがちだが、FLUXは単一方向データフローを実現することでこの課題を解決している。</p>
+
+<h1>技術や手法のキモはどこか？</h1>
+
+<p>Dispacherをシングルトンにすること、どのイベントに反応するかはStore側でハンドリングできるようにすること。
+それによってStoreの追加による機能拡張も容易になる。</p>
+
+<h1>参考URL</h1>
+
+<p><a href="https://facebook.github.io/flux/">Flux | Application Architecture for Building User Interfaces</a></p>
+
+<p><a href="https://github.com/facebook/flux/tree/master/examples/flux-concepts">flux/examples/flux-concepts at master &middot; facebook/flux &middot; GitHub</a></p>
+
+<p><a href="https://github.com/facebook/flux/tree/master/examples/flux-logging">flux/examples/flux-logging at master &middot; facebook/flux &middot; GitHub</a></p>
+
+</div></section></main></body></html>

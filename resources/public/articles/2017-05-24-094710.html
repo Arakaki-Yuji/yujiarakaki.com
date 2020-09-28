@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">PHPのループで書くと約30時間かかる大量の画像アップロード処理を、Clojureのcore.asyncで1時間以下に短縮できた話。</h1><div class="content">
+<p>1つの<a class="keyword" href="http://d.hatena.ne.jp/keyword/VPS">VPS</a>で動いている既存システムのAzureへの移行を進めています。</p>
+
+<p>その上で既存サーバーに入っている画像ファイルをBLOBストレージ(Azureのオブジェクトストレージ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>でいうS3)に移すという作業が必要になりました。</p>
+
+<p>最初はバックアップから画像ファイルをループでひとつづつアップロードする処理を<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>でシンプルに書きました。</p>
+
+<pre class="code" data-lang="" data-unlink>require_once &#39;vendor/autoload.php&#39;;
+
+use WindowsAzure\Common\ServicesBuilder;
+use MicrosoftAzure\Storage\Common\ServiceException;
+
+// Create blob REST proxy.
+$connectionString = &#34;&#34;;
+$blobRestProxy = ServicesBuilder::getInstance()-&gt;createBlobService($connectionString);
+
+// imagesディレクトリから画像ファイルを取得
+$images = getImagesFromDirectory(&#39;images&#39;);
+
+ foreach($files as $file){
+        $blob_name =  $path = &#34;images/&#34;.$file;
+        try {
+            $content = fopen($path, &#34;r&#34;);
+            $blobRestProxy-&gt;createBlockBlob(&#39;imgcontainer&#39;, $blob_name, $content);
+        }catch(Exception $e){
+            echo &#34;Exception Occers: &#34;.$path;
+            echo &#34;\n&#34;;
+            $code = $e-&gt;getCode();
+            $error_message = $e-&gt;getMessage();
+            echo $code.&#34;: &#34;.$error_message.&#34;\n&#34;;
+        }
+}
+</pre>
+
+
+<p>最初は100枚だけで試してみたんですが、100枚をアップロードするだけで50秒ほどの時間がかかりました。
+ただ画像ファイルはその時点で約23万枚ほどあり、単純計算でざっくり30時間ぐらいか<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A4%AB%A4%EB%A4%C8">かると</a>わかりました。</p>
+
+<p>つらい。。。</p>
+
+<p>30時間はつらい。。。</p>
+
+<p>覚悟を決めて30時間ぶん回ししてもよかったのですが、「もし間違いがあった場合にまた30時間やるの辛い」
+、「画像はいまも増えていくので再アップロードも必要になる」という理由から、なんとかもっと速く終わるようにプログラムを変えることにしました。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>は基本同期処理のプログラムなので、上記のやり方だとファイルアップロードの待ち時間の間処理が止まってしまいます。
+その待ち時間が<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DC%A5%C8%A5%EB%A5%CD%A5%C3%A5%AF">ボトルネック</a>だということは目に見えていたので、複数プロセス、非同期処理に変えてアップロードの待ち時間も<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%F3">バン</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%F3">バン</a>他のファイルをアップロードするように変えれば確実に速くなります。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>でそのような処理を書く方法もあると思いますが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>という言語のcore.asyncを使うと簡単に実装できるということを知っていたので<a class="keyword" href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>で実装し直すことにしました。</p>
+
+<p>core.asyncとは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>で並行プログラミングをするときによく使われるライブラリです。
+協調スレッドという軽量なスレッド(ネイティブスレッドではない)を作り、channel経由でスレッド間の通信を安全に行い非同期処理を行うプログラムを書くことができます。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/golang">golang</a>を使ったことがある人には、goroutineと同じようなものだと考えるとわかりやすいと思います。</p>
+
+<p>今回の画像アップロード処理を<a class="keyword" href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>のcore.asyncで書き直すと以下のようになりました。</p>
+
+<pre class="code" data-lang="" data-unlink>(ns azure-storage-clj.core
+  (:require [clojure.java.io :as io]
+            [clojure.core.async :as as
+             :refer [&gt;! &lt;! &gt;!! &lt;!! go chan buffer go-loop
+                     close! thread alts! alts!! timeout]]
+            [clojure.tools.logging :as log])
+  (:import [com.microsoft.azure.storage CloudStorageAccount]))
+
+(def connection-str &#34;&#34;)
+
+(def storage-account (CloudStorageAccount/parse connection-str))
+
+(def blob-client (.createCloudBlobClient storage-account))
+
+(def blob-container (.getContainerReference blob-client &#34;imgcontainer&#34;))
+
+// 画像を置いてあるディレクトリ以下からファイルだけを取得する
+(def filelist (filter #(.isFile %)
+                      (file-seq (io/file &#34;resources/images&#34;))))
+
+(defn image-upload [file]
+  (let [f-source file
+        filename (.getName file)
+        blob (.getBlockBlobReference blob-container (str &#34;images&#34; &#34;/&#34; filename))]
+    (.upload blob
+             (new java.io.FileInputStream f-source)
+             (.length f-source))))
+
+(defn files-upload []
+  (let [file-chan (chan 100) ;; バッファ100のチャネルをつくる] 
+    ;; チャネルからファイルをとり、アップロードする協調スレッドを100個つくる
+    (doseq [n (range 100)]
+      (go-loop []
+        (let [f (&lt;! file-chan)]
+          (do
+            (log/debug &#34;image-upload : &#34; f) // ログ出力
+            (image-upload f))) ;; 画像アップロード
+        (recur)))
+    ;; 画像ファイルのリストをひたすらチャネルに入れていく
+    (for [f filelist]
+      (&gt;!! file-chan f))))
+
+</pre>
+
+
+<p>処理は以下のようなイメージです。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/a/arakaji-yuu/20170524/20170524091829.png" alt="f:id:arakaji-yuu:20170524091829p:plain" title="f:id:arakaji-yuu:20170524091829p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<p>この実装を朝の4時くらい起きて実装し、100枚、500枚と試してみて大分速くなることは確認できたので、
+一気に全ファイル対象にして実行して<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C6%F3%C5%D9%BF%B2">二度寝</a>へと向かいました(それが5時ごろ)。</p>
+
+<p>7時くらいに目が覚めてPCの様子を伺うと、なんともう完了しているではありませんか。。。</p>
+
+<p>ログを見ると約1時間程度で終わっていたようです。</p>
+
+<p>感無量。。。。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Clojure">Clojure</a>を使うことで並行処理を簡単に実現できて、結果タスクにかかる時間も短縮できました。
+やはりいろんな<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%E9%A5%C0%A5%A4%A5%E0">パラダイム</a>の言語を知っておくとその時々の問題にあった手段を選べるのでいいですね。</p>
+
+</div></section></main></body></html>

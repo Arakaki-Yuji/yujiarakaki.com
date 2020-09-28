@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">windows7でvagrantを使う</h1><div class="content">
+<h1>はじめに</h1>
+
+<p>現在行っているプロジェクトで最初は自分一人エンジニアで開発を行っており開発環境に<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>を利用していたのですが、この度<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A1%BC%A5%AF%A5%A2%A5%C3%A5%D7">マークアップ</a>と連携する段階に入り、いままで自分の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac">Mac</a>に<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>で開発環境を作って開発してきたので、その環境を<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A1%BC%A5%AF%A5%A2%A5%C3%A5%D7">マークアップ</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/windows">windows</a>で再現するために<a class="keyword" href="http://d.hatena.ne.jp/keyword/windows">windows</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>を使う方法を調査したのでまとめおきたいと思います。</p>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>とは</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>とは仮想環境の起動、Stop、削除を<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%DE%A5%F3%A5%C9%A5%E9%A5%A4%A5%F3">コマンドライン</a>で簡単に操作でき、かつその仮想環境の設定(os、ネットワーク、メモリ割り当てなど)をVagrantfileという一つファイルで行なう事が出来る<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>です。</p>
+
+<p>このVagrantfileを共有することが簡単に仮想環境を構築できること、他の人と同じ開発環境を簡単に再現できることが魅力で使われている<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>です。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>についての説明はよりわかりやすい説明がされている<a href="http://dev.classmethod.jp/server-side/virtual-box-vagrant/">ブログ</a>があるので、ここでの説明は省略します。</p>
+
+<h1>インストール手順</h1>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> インストール</h2>
+
+<p>まず<a href="http://www.vagrantup.com/downloads.html">公式サイト</a>からダウロードします。<a class="keyword" href="http://d.hatena.ne.jp/keyword/Windows">Windows</a>を選択して、ダウロードして下さい。</p>
+
+<p>インストールしたファイルをダブルクリックして、あとは説明に従えば上手く行きます。</p>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/VirtualBox">VirtualBox</a>をインストール</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>で利用する仮想環境を作るためにはなんらかの仮想化<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>が必要です。ここでは自分も使っている<a class="keyword" href="http://d.hatena.ne.jp/keyword/VirtualBox">VirtualBox</a>を利用するのでインストールします。</p>
+
+<p><a href="https://www.virtualbox.org/wiki/Downloads">公式サイトのダウロードページ</a>にある「<a class="keyword" href="http://d.hatena.ne.jp/keyword/VirtualBox">VirtualBox</a> 4.3.28 for <a class="keyword" href="http://d.hatena.ne.jp/keyword/Windows">Windows</a> hosts -> <a class="keyword" href="http://d.hatena.ne.jp/keyword/x86">x86</a>/<a class="keyword" href="http://d.hatena.ne.jp/keyword/amd64">amd64</a>」を選択してダウロードして下さい。</p>
+
+<p><img src="https://qiita-image-store.s3.amazonaws.com/1260/26205/68d4e773-a339-eca6-a1d5-7277c418f658.png" alt="スクリーンショット 2015 06 02 15.46.05.png" /></p>
+
+<p>ダウンロードしたファイルをクリックしたらインストールが始まります。ここも説明どおり進めていけば問題ありません。</p>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/VirtualBox">VirtualBox</a>のパスをユーザー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>Pathに設定する</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>が<a class="keyword" href="http://d.hatena.ne.jp/keyword/VirtualBox">VirtualBox</a>を使用するためにユーザー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>Pathに<a class="keyword" href="http://d.hatena.ne.jp/keyword/VirtualBox">VirtualBox</a>のパスを設定する必要があります。
+特別に変更せずに進めていれば、C:\Program Files\<a class="keyword" href="http://d.hatena.ne.jp/keyword/Oracle">Oracle</a>\<a class="keyword" href="http://d.hatena.ne.jp/keyword/VirtualBox">VirtualBox</a>にインストールされているはずなので確認して下さい。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/VirtualBox">VirtualBox</a>をインストールしたパスが確認できれば、それを<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>に設定します。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>の設定するにはWindowボタン->Computer->System properties -> Change settingsとを辿ると以下の設定画面を表示させます。(画像は英語になっているので日本語に読みかえて下さい。)</p>
+
+<p><img src="https://qiita-image-store.s3.amazonaws.com/1260/26205/ba1ba62d-f568-f186-cb22-7fe178817b30.png" alt="スクリーンショット 2015-06-02 16.29.28.png" /></p>
+
+<p>画面の下にある「Environment Variables」ボタンをクリックすると<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>設定画面に入ります。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>の設定画面には上部の「ユーザー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>(User variables for ユーザー名)」と下部の「システム<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>(System variables)」があります。</p>
+
+<p>ユーザー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>のPathに先ほど確認した<a class="keyword" href="http://d.hatena.ne.jp/keyword/VirtualBox">VirtualBox</a>のPathを追加したのですが、もしすでにPathがあればすでに書かれている値の後に追記してください。
+もしなければNewボタンをクリックして、新規に作成します。</p>
+
+<p><img src="https://qiita-image-store.s3.amazonaws.com/1260/26205/2b4ef2f3-785d-b6b4-c566-bed0a54212b7.png" alt="スクリーンショット 2015-06-02 16.32.16.png" /></p>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>で仮想環境を立ち上げる</h2>
+
+<p>インストール&amp;設定が上手くいったか確認するため、<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>を使ってみる。</p>
+
+<p>好きなディレクトリに移動して、以下のコマンドを実行してください。</p>
+
+<pre class="code" data-lang="" data-unlink>$ vagrant init hashicorp/precise32</pre>
+
+
+<p>成功するとVagrantfileが作成されます。
+そのVagrantfileで定義された仮想環境を立ち上げるには以下のコマンドを実行します。</p>
+
+<pre class="code" data-lang="" data-unlink>$ vagrant up</pre>
+
+
+<p>上手くいけば指定された仮想環境のboxのインストールから立ち上げまで行ってくれます。</p>
+
+<h4>注意点</h4>
+
+<p>もし<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> upしたときにエラーが発生し、「<a class="keyword" href="http://d.hatena.ne.jp/keyword/VirtualBox">VirtualBox</a>がインストールされていない」というエラーメッセージが表示された場合まだ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>Pathが<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%DE%A5%F3%A5%C9%A5%D7%A5%ED%A5%F3%A5%D7%A5%C8">コマンドプロンプト</a>に反映されていないのが原因かもしれません。
+一度<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%DE%A5%F3%A5%C9%A5%D7%A5%ED%A5%F3%A5%D7%A5%C8">コマンドプロンプト</a>を再起動させると上手くいくかもしれないので試してみて下さい。(自分は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Windows">Windows</a>自体を再起動したけど。。)</p>
+
+<h1>課題</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>で立ち上げた仮想環境に<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>で簡単にログインできるコマンドで<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>というのがありますが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Windows">Windows</a>だとデフォルトで<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>クライアントが入っておらず使えない。。</p>
+
+<p>この<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>を使えるようにするのは<a href="http://arakaji.hatenablog.com/entry/2015/06/04/111147">別記事</a>にまとめましたのでそちらを参考にして下さい。</p>
+
+</div></section></main></body></html>

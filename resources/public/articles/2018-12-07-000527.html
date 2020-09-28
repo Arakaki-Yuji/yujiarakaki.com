@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">Webフレームワークに依存しない、PHP製のシンプルなSQL マイグレーションツール「mig」を作った。</h1><div class="content">
+<p>タイトル通り、特定のWebフレームワークに依存しない<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>製のシンプルな<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>ツール<a href="https://github.com/Arakaki-Yuji/mig">「Mig」</a>を作りました。</p>
+
+<h1>なぜ作ったのか</h1>
+
+<p>大体Webフレームワークにはこの手<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>ツールはついていますが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/DSL">DSL</a>を書かされたり、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0%B8%C0%B8%EC">プログラミング言語</a>の中に<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を文字列として渡して実行するものが多いです。<a class="keyword" href="http://d.hatena.ne.jp/keyword/DSL">DSL</a>だと抽象化されている分DB特有の機能が使えなかったり、文字列として<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を渡すのはエディタの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%F3%A5%BF%A5%C3%A5%AF%A5%B9">シンタックス</a>ハイライトが使えないのも不便だと考えていました。</p>
+
+<p>そのため<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>用の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>ファイル生成の管理、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>と<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%EB%A5%D0%A5%C3%A5%AF">ロールバック</a>の管理のみを行い、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>も直接<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>ファイルに書くことができるツールを作りました。</p>
+
+<h1>使い方</h1>
+
+<h2>インストール</h2>
+
+<p>composer でglobal installします。</p>
+
+<pre class="code" data-lang="" data-unlink>$ composer global require arakaki-yuji/mig</pre>
+
+
+<p>composerでmigがインストールされますので、実行できるように実行パスを通しておきます。</p>
+
+<pre class="code" data-lang="" data-unlink>$ export PATH=$PATH:$HOME/.composer/vendor/bin</pre>
+
+
+<h2>DBへの接続情報を記載した設定ファイルの設置</h2>
+
+<p>プロジェクトのルート<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%A3%A5%EC%A5%AF%A5%C8">ディレクト</a>リにmig.config.<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>という名前でDB接続情報を記載した設定ファイルを設置します。</p>
+
+<pre class="code" data-lang="" data-unlink>&lt;?php
+
+return [
+    &#39;db_dsn&#39; =&gt; &#39;&#39;, // example: mysql:host=localhost:3306;dbname=project_db;
+    &#39;db_username&#39; =&gt; &#39;&#39;,
+    &#39;db_passwd&#39; =&gt; &#39;&#39;, 
+    &#39;migration_filepath&#39; =&gt; &#39;migrations&#39; // directory for place SQL scripts.
+];</pre>
+
+
+<h2>初期化</h2>
+
+<p>設定ファイルが設置されている<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%A3%A5%EC%A5%AF%A5%C8">ディレクト</a>リに移動し、初期化コマンドを実行します。</p>
+
+<pre class="code" data-lang="" data-unlink>$ mig-cli init</pre>
+
+
+<p>すると<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>の実行履歴を管理するmigrationsテーブルが作成されます。</p>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>ファイルの作成</h2>
+
+<p><code>mig-cli create [名前]</code> コマンドを実行すると指定された名前を使ってファイルが２つ作られます。</p>
+
+<pre class="code" data-lang="" data-unlink>$ mig-cli create migration-filename
+Create a new migration file.
+=================
+
+create migrations/20181121144957_migration-filename.up.sql
+create migrations/20181121144957_migration-filename.down.sql</pre>
+
+
+<p>up.<a class="keyword" href="http://d.hatena.ne.jp/keyword/sql">sql</a> が<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を実行するときに実行する<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>ファイル、down.<a class="keyword" href="http://d.hatena.ne.jp/keyword/sql">sql</a>が<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>をrollabackするときに実行される<a class="keyword" href="http://d.hatena.ne.jp/keyword/sql">sql</a>ファイルです。</p>
+
+<p>たとえば <code>items</code>というテーブルを作る<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を作る場合、まずup.<a class="keyword" href="http://d.hatena.ne.jp/keyword/sql">sql</a>ファイルにテーブル定義の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を書きます。</p>
+
+<pre class="code" data-lang="" data-unlink>CREATE TABLE IF NOT EXISTS `items` (
+  `id` int(11) PRIMARY KEY,
+  `name` varchar(255) NOT NULL
+);</pre>
+
+
+<p>次に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%EB%A5%D0%A5%C3%A5%AF">ロールバック</a>する(もとに戻す)ときのための<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>をdown.<a class="keyword" href="http://d.hatena.ne.jp/keyword/sql">sql</a>に書きます。</p>
+
+<pre class="code" data-lang="" data-unlink>DROP TABLE IF EXISTS `items`;</pre>
+
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>の実行</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を実行は以下のコマンドを実行します。</p>
+
+<pre class="code" data-lang="" data-unlink>$ mig-cli migrate</pre>
+
+
+<p>これで自分の環境で実行されていない<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>が一度に実行されます。</p>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%EB%A5%D0%A5%C3%A5%AF">ロールバック</a>の実行</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%EB%A5%D0%A5%C3%A5%AF">ロールバック</a>の実行は以下のコマンドを実行します。</p>
+
+<pre class="code" data-lang="" data-unlink>$ mig-cli rollback</pre>
+
+
+<p>これで、自分の環境で実行された最新の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>が一つ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%ED%A1%BC%A5%EB%A5%D0%A5%C3%A5%AF">ロールバック</a>されます。</p>
+
+<h1>終わりに</h1>
+
+<p>もし興味があればぜひ使ってみて、バグあればIssueもください！</p>
+
+<p>あと、何も考えず<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a>にそっとスターを押して頂けると嬉しいです笑</p>
+
+</div></section></main></body></html>

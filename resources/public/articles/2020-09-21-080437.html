@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">tmuxのプレフィックスキーを変更する</h1><div class="content">
+<p>tmuxは <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%EC%A5%D5%A5%A3%A5%C3%A5%AF%A5%B9">プレフィックス</a>キー + 任意のキー の組み合わせでショートカットキーが作られており、そのショートカットを使って操作をする。</p>
+
+<p>デフォルトだと Ctrl + b が<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%EC%A5%D5%A5%A3%A5%C3%A5%AF%A5%B9">プレフィックス</a>キーに割り当てられているが、個人的には使いにくいので別のキーをPrefixに割り当てたい。</p>
+
+<p>~/.tmux.confに以下のように設定すると、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%EC%A5%D5%A5%A3%A5%C3%A5%AF%A5%B9">プレフィックス</a>キーを Ctrl + t に変更できる。</p>
+
+<pre class="code ~/.tmux.conf" data-lang="~/.tmux.conf" data-unlink>set -g prefix C-t
+</pre>
+
+
+</div></section></main></body></html>

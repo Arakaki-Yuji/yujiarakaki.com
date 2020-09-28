@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">slimからJSの世界にデータをjsonで渡す</h1><div class="content">
+<p>いまWebのフロントエンド開発において、JSで一部のHTMLを動的に構築することが増えてきた。
+JSでデータからHTMLを構築する場合、そのデータの部分はやっぱり<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>の方が扱いやすい。</p>
+
+<p>自分は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>のテンプレートエンジンにslimを使っているので、slimでJSの世界に<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>を渡す方法を考えたので書いておく。</p>
+
+<h1>htmlのdata-attributeに<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>を渡す</h1>
+
+<p>こんな感じ。</p>
+
+<pre class="code" data-lang="" data-unlink>div.data-getter data-getter=@value.to_json
+
+javascript:
+  var value = JSON.parse($(&#39;.data-getter&#39;).attr(&#39;data-getter&#39;));
+</pre>
+
+
+<h1>jsにデータ受け取り用のglobal変数を作って、そこに渡す</h1>
+
+<p>こんな感じ。</p>
+
+<pre class="code" data-lang="" data-unlink>javascript:
+  DataGetter = {};
+  DataGetter.value = #{raw @value.to_json}
+
+</pre>
+
+
+</div></section></main></body></html>

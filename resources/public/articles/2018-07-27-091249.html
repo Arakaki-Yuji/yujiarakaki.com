@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">「デザイン思考」のワークショップで学んだユーザーインタビューを実践してみた。</h1><div class="content">
+<p>前回ブログでも書いたんですが、ワークショップで「デザイン思考」について学んだので、そこで重要だと学んだ「ユーザーインタビュー」について実践してみました。</p>
+
+<p>ちなみに前回の記事はこちら。</p>
+
+<p><a href="http://arakaji.hatenablog.com/entry/2018/07/23/105643">Okinawa Dialog&#x306E;&#x30C7;&#x30B6;&#x30A4;&#x30F3;&#x601D;&#x8003;&#x306E;&#x30EF;&#x30FC;&#x30AF;&#x30B7;&#x30E7;&#x30C3;&#x30D7;&#x306B;&#x884C;&#x3063;&#x3066;&#x304D;&#x307E;&#x3057;&#x305F;&#x3002; - &#x3086;&#x30FC;&#x3058;&#x306E;&#x308D;&#x3050;</a></p>
+
+<p>今回は自分が現在開発中のプロジェクト共有サービス「Collabo」について、実際非営利組織で人材育成やイベント運営を行っている方にインタビューさせていただきました。</p>
+
+<p>具体的な質疑応答内容は差し控えますが、Collaboの核である「だれでも見えるオープンな状態プロジェクト管理をおこなう」ということについてはあまり魅了を感じていないことがわかりました。</p>
+
+<p>ユーザーインタビューを通して再認識したのが、そもそもクローズドないまの状態で必要な人にLINEのグループや<a class="keyword" href="http://d.hatena.ne.jp/keyword/Facebook">Facebook</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%C3%A5%BB%A5%F3%A5%B8%A5%E3%A1%BC">メッセンジャー</a>に入れてその中でコミュニケーションとるということで十分で、それをわざわざオープンにすることで発生するリスクを考慮するとメリットが見えないということでした。</p>
+
+<p>また、やはりフルオープンにすることには大きな問題が発生しうるので、細かな権限管理の重要性に気づきました。</p>
+
+<p>今回のインタビューについてわかったことをまとめると以下のようになります。</p>
+
+<ul>
+<li>オープンにするということ自体には少し興味がある。</li>
+<li>しかし、デメリットを超えるほどのメリットが見えない(情報統制、既存ツールで事足りている)</li>
+<li>オープンにしていいものと、してはいけないものを細かく管理できる権限管理は必須</li>
+<li>オープンにしたことによる<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BB%A5%F3%A5%C6%A5%A3%A5%D6">インセンティブ</a>設計が必要</li>
+</ul>
+
+
+<p>特にプロジェクトをオープンにすることによる<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BB%A5%F3%A5%C6%A5%A3%A5%D6">インセンティブ</a>は改めて重要だなと気づきました。</p>
+
+<p>よくCollaboを説明する上で「ソフトウェア開発における<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AA%A1%BC%A5%D7%A5%F3%A5%BD%A1%BC%A5%B9">オープンソース</a>の文化のように、様々なプロジェクトに誰もが参加してコラボレーションを行えるようにする」という風に説明するのですが、ソフトウェア開発においては、そもそもオープンにしないと使ってもらえないだとか、バグ報告だけでなくバグ修正などもオープンにすることで得られるなどの、オープンにする<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BB%A5%F3%A5%C6%A5%A3%A5%D6">インセンティブ</a>がすでに設計されていることに気づきました。</p>
+
+<p>Collaboで運営されるプロジェクトにおいても、そこで運営することによる明確な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BB%A5%F3%A5%C6%A5%A3%A5%D6">インセンティブ</a>を意図的に設計して組み込んでいかないといけないので、これは当初思い描いていたよりも難しい課題だなと再認識しました。</p>
+
+<p>Collaboにおける課題は「既存ソフトウェアを超える利便性」、「オープンとクローズドを簡潔にコン<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%ED%A1%BC%A5%EB">トロール</a>可能にする」、「オープンにプロジェクトを行う<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BB%A5%F3%A5%C6%A5%A3%A5%D6">インセンティブ</a>設計(<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D6%A5%ED%A5%C3%A5%AF%A5%C1%A5%A7%A1%BC%A5%F3">ブロックチェーン</a>・<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A1%BC%A5%AF">トーク</a>ンエコノミーを取り入れる？)」ということが、今回のユーザーインタビューで見えてきたので、やはりやってみてよかったと思います。
+今後のプロジェクトにおいてもデザイン思考を取り入れた<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B3%AB%C8%AF%A5%D7%A5%ED%A5%BB%A5%B9">開発プロセス</a>をどんどん回していきたいとおもいます。</p>
+
+</div></section></main></body></html>

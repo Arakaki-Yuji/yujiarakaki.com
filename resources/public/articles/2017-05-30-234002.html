@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">Webアプリケーションプログラムにおいて、「良いコードを書く」ための基本的な方針</h1><div class="content">
+<p>自分は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>を用いてWebアプリを書くことが多いのですが、その上で可能限り「良いコード」を書くように心がけています。</p>
+
+<p>ただ、この「良いコード」というのがかなりの曲者で、プログラミングにおいてのイディオム的なことから<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AA%A5%D6%A5%B8%A5%A7%A5%AF%A5%C8%BB%D8%B8%FE">オブジェクト指向</a>の話、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%B6%A5%A4%A5%F3%A5%D1%A5%BF%A1%BC%A5%F3">デザインパターン</a>や<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0%B8%C0%B8%EC">プログラミング言語</a>においてのベストプラクティス、使用している<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>のベストプラクティス、さらに広げると<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>駆動設計の話までかなり広い範囲が含まれてしまいます。</p>
+
+<p>チームによっての技術レベルや目標としているものはもちろん違うので、基本的には現場現場で話し合って自分達の目指す「良いコード」を定義することが重要になるでしょう。</p>
+
+<p>今回はMCV<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>を使ってWebアプリケーションを良いコードで書く上で、どの現場でも理解できて、かつ実践できるであろう私の頭にある「良いコードを書く」ための基本的な方針をまとめてみました。</p>
+
+<p>まとめる上で、出来る限り<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AA%A5%D6%A5%B8%A5%A7%A5%AF%A5%C8%BB%D8%B8%FE">オブジェクト指向</a>や<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%F3%A5%BF%A1%BC%A5%D7%A5%E9%A5%A4%A5%BA">エンタープライズ</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>などの用語を使わないように意識しています。</p>
+
+<p>特に真新しいことはなにもなく、当たり前になっているとは思いますが、自分の頭の中を吐き出すためにこのブログを使おうかと。</p>
+
+<h1>基本的な方針</h1>
+
+<h2>１．やっていることが違うコードは分離して名前をつける</h2>
+
+<p>管理画面などを<a class="keyword" href="http://d.hatena.ne.jp/keyword/MVC">MVC</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>で開発をしていてたまーにあるのが、おなじURLにPOSTされていても送信されてくるデータによって新規作成になったり、更新になったり、または違うテーブルのデータを更新する処理にかわったりすることです。これは管理画面を作る際に関連のある２つのテーブルのデータを<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E6%A1%BC%A5%B6%A5%D3%A5%EA%A5%C6%A5%A3">ユーザビリティ</a>のために一つの画面で更新できるようにした場合に発生します。</p>
+
+<p>この時に愚直にコントローラー内の一つのアクションにすべての処理を書いていくと、コードが長くなりますし不用意に別の役割をしているコードに依存した処理を書いてしまいバグの温床になることがあります。</p>
+
+<p>出来るだけ違うことをおこなうアクションは別にする。
+もしUX上別に出来ない事がある場合はおなじアクションを叩くにしても内部上では別のメソッドを分離して、そのメソッドに処理を行わせるようにしています。</p>
+
+<p>もちろんこれはコントローラーだけではなく、その他のプログラムにおいても同じです。</p>
+
+<p>分離したメソッド名を適切な名前にすると、その名前をみるだけで何をしているのかわかるので可読性も上がります。</p>
+
+<h2>２.　どこに責任を持たせるのかを決める</h2>
+
+<p>例えば商品を表現するDBのテーブルproductsがあり、各商品の識別子(ID)は企業名を表すアルファベット二文字(PKやITなど)とインクリメンタルの数値の8桁でないといけないというルールがあるとする。</p>
+
+<p>そのようなルールがあったときに、商品の作成処理をおこなうControllerで毎回ID作成のためのロジックを書くのはコードの重複が増える上に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DE%A1%BC">プログラマー</a>がルールを常に覚えていないといけないため問題です。</p>
+
+<p>その問題を避けるため、商品の識別子を作成するためのメソッドを定義し、商品識別子の作成ロジックの責任はこのメソッドのみに持たせます。</p>
+
+<p>責任を持たせるメソッドを定義することによりコードの重複が減り、かつビジネス上のルールをコードで表現することで可読性が上がります。</p>
+
+<h2>3.　Web以外のインターフェースがあることを意識する</h2>
+
+<p>Webアプリケーション開発において<a class="keyword" href="http://d.hatena.ne.jp/keyword/MVC">MVC</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>を使って開発をしているとき、注意をせずに開発をすると重要な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D3%A5%B8%A5%CD%A5%B9%A5%ED%A5%B8%A5%C3%A5%AF">ビジネスロジック</a>がコントローラー側に漏れていく事が多くあります。しかしControllerはWebのRequestとResponseが交わる場所になるので、ここに<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D3%A5%B8%A5%CD%A5%B9%A5%ED%A5%B8%A5%C3%A5%AF">ビジネスロジック</a>を書くとWebのRequestとResponseに依存したプログラムになってしまいがちです。</p>
+
+<p>そんなときに困るのが、同じような機能を提供する別の画面を作ったり、WebのUIではなくWebAPIを作ったり、または<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%DE%A5%F3%A5%C9%A5%E9%A5%A4%A5%F3">コマンドライン</a>のタスクを作ったりなど別のインターフェースから同一の機能を提供しようとしたときに、ロジックを抽出するのが難しくなってしまいます。</p>
+
+<p>そのため、重要な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D3%A5%B8%A5%CD%A5%B9%A5%ED%A5%B8%A5%C3%A5%AF">ビジネスロジック</a>を書くときには常に今のUIとは別のUI・インターフェースから使われるときのことも意識し、Controllerから分離してコードを書きます。</p>
+
+<h2>4.  小さなプログラムを組み合わせて大きなプログラムを書く</h2>
+
+<p>大きなプロダクト一塊にして書くよりも小さなプログラムを作って細かく分割し、それを組み合わせて大きな機能を作ります。</p>
+
+<p>そうすることで依存性も低く再利用性も高い小さいなコード群がたくさん生まれ、別の機能を作るときにそれらのコードを使ってより早く開発することができます。</p>
+
+<h1>おわりに</h1>
+
+<p>もちろん上記以外にも考えることは多いのですが、私が特に意識しているのがこの４つです。</p>
+
+<p>こういうのを「単一責任の法則」的な法則名で意思疎通できると、話は早いんだろうなー。</p>
+
+</div></section></main></body></html>

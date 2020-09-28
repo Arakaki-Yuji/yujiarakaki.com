@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">生のHTMLを書くことが辛くなってきた。</h1><div class="content">
+<p>自分はWebアプリケーションエンジニアで、 １年程前まではサーバーサイドを<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>で書いていたのでその延長でHTMLを書くことには特に何も思うことはありませんでした。</p>
+
+<p>ただこの一年ぐらいはサーバーサイドにRubyonRailsを採用して<a href="http://slim-lang.com/">Slim</a>というテンプレートエンジンを使っています。
+SlimというのはHTMLをもっと簡易的にかける<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>で、例えば以下のようなHTMLを</p>
+
+<pre class="code lang-html" data-lang="html" data-unlink>
+<span class="synComment">&lt;!DOCTYPE html&gt;</span>
+<span class="synIdentifier">&lt;</span><span class="synStatement">html</span><span class="synIdentifier">&gt;</span>
+  <span class="synIdentifier">&lt;</span><span class="synStatement">head</span><span class="synIdentifier">&gt;</span>
+<span class="synPreProc">    </span><span class="synIdentifier">&lt;</span><span class="synStatement">meta</span><span class="synIdentifier"> </span><span class="synType">charset</span><span class="synIdentifier">=</span><span class="synConstant">&quot;utf-8&quot;</span><span class="synIdentifier"> /&gt;</span>
+<span class="synPreProc">    </span><span class="synIdentifier">&lt;</span><span class="synStatement">title</span><span class="synIdentifier">&gt;</span>Sample File<span class="synIdentifier">&lt;/</span><span class="synStatement">title</span><span class="synIdentifier">&gt;</span>
+<span class="synPreProc">  </span><span class="synIdentifier">&lt;/</span><span class="synStatement">head</span><span class="synIdentifier">&gt;</span>
+  <span class="synIdentifier">&lt;</span><span class="synStatement">body</span><span class="synIdentifier"> </span><span class="synType">class</span><span class="synIdentifier">=</span><span class="synConstant">&quot;sample&quot;</span><span class="synIdentifier">&gt;</span>
+    <span class="synIdentifier">&lt;</span><span class="synStatement">div</span><span class="synIdentifier"> </span><span class="synType">id</span><span class="synIdentifier">=</span><span class="synConstant">&quot;contents&quot;</span><span class="synIdentifier">&gt;</span>
+      <span class="synIdentifier">&lt;</span><span class="synStatement">h1</span><span class="synIdentifier">&gt;</span>Sample File<span class="synIdentifier">&lt;/</span><span class="synStatement">h1</span><span class="synIdentifier">&gt;</span>
+      <span class="synIdentifier">&lt;</span><span class="synStatement">img</span><span class="synIdentifier"> </span><span class="synType">alt</span><span class="synIdentifier">=</span><span class="synConstant">&quot;yterajima&quot;</span><span class="synIdentifier"> </span><span class="synType">src</span><span class="synIdentifier">=</span><span class="synConstant">&quot;http://www.e2esound.com/images/yterajima.jpg&quot;</span><span class="synIdentifier"> /&gt;</span>
+      <span class="synIdentifier">&lt;</span><span class="synStatement">p</span><span class="synIdentifier">&gt;</span>テキストテキストテキスト<span class="synIdentifier">&lt;/</span><span class="synStatement">p</span><span class="synIdentifier">&gt;</span>
+      <span class="synIdentifier">&lt;</span><span class="synStatement">p</span><span class="synIdentifier">&gt;</span>テキストテキストテキスト
+        テキストテキストテキスト<span class="synIdentifier">&lt;/</span><span class="synStatement">p</span><span class="synIdentifier">&gt;</span>
+    <span class="synIdentifier">&lt;/</span><span class="synStatement">div</span><span class="synIdentifier">&gt;</span>
+  <span class="synIdentifier">&lt;/</span><span class="synStatement">body</span><span class="synIdentifier">&gt;</span>
+<span class="synIdentifier">&lt;/</span><span class="synStatement">html</span><span class="synIdentifier">&gt;</span>
+</pre>
+
+
+<p>以下のように簡易記法でかけます。</p>
+
+<pre class="code lang-haml" data-lang="haml" data-unlink>doctype html
+html
+  head
+    meta charset=<span class="synConstant">&quot;utf-8&quot;</span>
+    title Sample File
+  body.sample
+    <span class="synSpecial">#</span><span class="synIdentifier">contents</span>
+      h1 Sample File
+
+      img src=<span class="synConstant">&quot;http://www.e2esound.com/images/yterajima.jpg&quot;</span> alt=<span class="synConstant">&quot;yterajima&quot;</span>
+
+      p テキストテキストテキスト
+
+      p
+        | テキストテキストテキスト
+          テキストテキストテキスト
+</pre>
+
+
+<p>もし興味があれば、slimの詳しい説明は<a href="http://slim-lang.com/">公式サイト</a>や<a href="http://qiita.com/yterajima/items/53fd0387279510ff082a">速習テンプレートSlim(HTML作成編)</a>を見ていただけるとよくわかるので参考にしてみてください。</p>
+
+<p>一度Slimのようなテンプレートエンジンを使うと、書くコードが格段に減りますし、コードが減るので効率、可読性、メンテナンス性も格段に上がります。
+その恩恵を受けると、生でHTMLが辛くなってくるんですよねーー。</p>
+
+</div></section></main></body></html>

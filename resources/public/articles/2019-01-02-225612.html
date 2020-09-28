@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">「サーベイログ」HeteroTSDB</h1><div class="content">
+<p>読んだ論文</p>
+
+<p><a href="https://yuuk.io/papers/heterotsdb_iots2018.pdf">https://yuuk.io/papers/heterotsdb_iots2018.pdf</a></p>
+
+<h1>どんなもの？</h1>
+
+<p>モニタリングサービスのインフラとなる時系列データベースに求められる書き込み性能、保存効率、データ構造の拡張製、スケーラビリティを実現するためにインメモリKVSとオンメモリKVSを組み合わせた異種混合KVSによる自動階層化する時系列データベース<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a></p>
+
+<h1>先行研究と比べてどこが凄い？</h1>
+
+<p>先行研究ではデータストアが密結合であったため、データの拡張性が低かったが本<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C1%C2%B7%EB%B9%E7">疎結合</a>のため拡張性がたかい(新たな性質を持つデータストアを組み合わせることが可能)</p>
+
+<ul>
+<li>InfluxDB</li>
+<li>OpenTSDB</li>
+<li>Gorilla</li>
+</ul>
+
+
+<h1>技術や手法のキモはどこ？</h1>
+
+<p>書き込み性能とデータ保存効率という性能要件を実現するために、特性に合った<a class="keyword" href="http://d.hatena.ne.jp/keyword/DBMS">DBMS</a>を組み合わせたこと。</p>
+
+<h1>どうやって有効だと検証した？</h1>
+
+<h2>書き込み処理効率の計測</h2>
+
+<p>オンディスクKVSに直接書き込む場合と比較し、インメモリKVSで書き込みを受けることにより、オンディスクKVSの書き込み回数が減っていることを確認する</p>
+
+<h2>データ保存効率</h2>
+
+<p>インメモリKVSへの書き込みを続けても空きメモリが0にならずにオンディスクKVSにデータを移動できているか確認する</p>
+
+<h2>書き込みスケールアウト性</h2>
+
+<p>各KVSのキャパシティを増加させたときに、分間書き込み回数がスケールアウトするかどうかを確認する。</p>
+
+<h1>議論はある？</h1>
+
+<p>とくになし</p>
+
+<h1>次によむべき論文は？</h1>
+
+<ul>
+<li>The Log-Structured Merge-Tree</li>
+<li>Time SEries Management Systems</li>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/BigTable">BigTable</a>: A Distributed Storage System for Structured Data</li>
+</ul>
+
+
+<h1>メモ</h1>
+
+<p>提案: HeteroTSDB<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>
+先行手法: OpenTSDB
+高めたい指標: スケーラビリティ、書き込み性能、保存領域、拡張性を<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C1%C2%B7%EB%B9%E7">疎結合</a>なソフトウェアとすることで実現、高可用性
+データ構造の拡張性を考慮した時系列データベースは提案されていない→新規性
+拡張内容に合わせた異なる<a class="keyword" href="http://d.hatena.ne.jp/keyword/DBMS">DBMS</a>を追加する<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C1%C2%B7%EB%B9%E7">疎結合</a>な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A1%BC%A5%AD%A5%C6%A5%AF%A5%C1%A5%E3">アーキテクチャ</a>をとりつつ、利用者からはREAD/WRITEのための<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%BF%A1%BC%A5%D5%A5%A7%A5%A4%A5%B9">インターフェイス</a>をそれぞれ一つに見えるように統一
+書き込み性能→インメモリKVS
+データ保存効率を高める→オンディスクKVS
+AWSのサーバレスプラットフォーム上に構築することで異種混合<a class="keyword" href="http://d.hatena.ne.jp/keyword/DBMS">DBMS</a>構成を取りやすくしている→構築やスケールアウト作業の負担軽減
+KVS間のデータ移動のためのタイマー手法
+LSM-Tree(Log Structured Merge Tree)</p>
+
+</div></section></main></body></html>

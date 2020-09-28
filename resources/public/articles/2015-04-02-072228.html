@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">フロントエンド開発にRailsアプリでもnodeのエコシステムを使うという選択</h1><div class="content">
+<h1>はじめに</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>ではデファルトでAsset Pipelineという機能により、SassやaltJs(<a class="keyword" href="http://d.hatena.ne.jp/keyword/CoffeeScript">CoffeeScript</a>やTypeScript)の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB">コンパイル</a>やファイルの結合、圧縮を行ってくれる機能があります。
+なので通常はバックエンドを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>で開発する場合はフロントエンドも<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>に沿って開発を行います。</p>
+
+<p>最近自分がメイン開発者(というかほぼ一人?)として新<a class="keyword" href="http://d.hatena.ne.jp/keyword/Web%A5%B5%A1%BC%A5%D3%A5%B9">Webサービス</a>開発プロジェクトが始まり、バックエンドの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>を使うことにしたのですが、様々な検討の結果フロントエンドは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>のエコシステムではなく、nodeのエコシステムを使うことを選択しました。</p>
+
+<p>振り返ったときにこの選択が正解だったのかどうかを確認するためにも、ここでなぜこの選択をおこなったのかをまとめておきたいと思います。</p>
+
+<h1>依存性の管理にnpmを使いたい</h1>
+
+<p>フロントエンド開発を生産的に行うに、当然様々なライブラリを扱います。</p>
+
+<p>そのライブラリを管理するのに一番ベタな方法はライブラリのソースをダウンロードしてライブラリ用ディレクトリに設置することです。</p>
+
+<p>そこから少し進化したのが、<a href="http://bower.io/">Bower</a>というパッケージ管理<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>のbower.<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>にアプリが依存しているライブラリを明記してインストールするようになりました。</p>
+
+<p>ただ最近ではnodeが提供している標準のパッケージ管理システム npmを、そのままフロントエンド<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>の依存性管理にも使えるようにする<a href="http://browserify.org/">browserify</a>という<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>も使用されるようになっています。
+このbrowserifyが優れもので、サーバサイドのnodeでライブラリを使用するときに行うrequire('module名')をフロントエンド<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>の世界でも使えるようにしてくれます。</p>
+
+<pre class="code" data-lang="" data-unlink>
+var react = require(&#39;react&#39;)
+</pre>
+
+
+<p>あくまで私の観測範囲ですが、フロントエンドに関する記事やライブラリのREADMEなどを見ているとフロントエンド<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>の世界での依存管理でもnpmを使うことが前提となっていく感じがしていて、それが出来ないがために何かを行うときに無駄にハマってしまう予感がしています。</p>
+
+<h1>他チーム、他プロジェクトへノウハウの共有がしやすい</h1>
+
+<p>フロントエンド開発は高度化、複雑化しており、上記にあげた依存性の管理の他にもSassやAltJSの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB">コンパイル</a>や圧縮、結合、ライブラリの選定や設計など様々な問題を解決しなければなりません。
+これらを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>エコシステムにのった方法で解決しても、その知識は他の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>を利用したプロジェクトやチームと共有できません。</p>
+
+<p>うちの会社で行われる開発で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>を選択するのは私がメンバーに入るときぐらいで、他の場合は<a class="keyword" href="http://d.hatena.ne.jp/keyword/CakePHP">CakePHP</a>やほとんどバックエンドが必要ないWebサイトの制作が大多数を占めています。</p>
+
+<p>自分が学んだ知識を他のチームとお互いに共有したり、また他のチームの開発に入った時に自分がスムーズにヘルプできるようにし、会社全体でのフロントエンド開発の生産性を高めるためにもフロントエンド開発ではnodeのエコシステムに乗るべきだと判断しました。</p>
+
+<h1>おわりに</h1>
+
+<p>今回のプロジェクトではサービスの企画立案から、開発に関わる技術選択、実際の開発まですべてに関わることができるのですが、あらためて「どの技術を選択するか」を考えることの難しさと面白さを感じました。</p>
+
+<p>良い技術選択を行えば、開発者のモチベーションアップや生産性アップにもつながれば、その逆に陥ることもあります。</p>
+
+<p>今回意識したのは「１年後の当たり前になっているか」ということで、1年後はいま以上にフロントエンド開発のnode前提は加速すると予測し、この選択を行いました。</p>
+
+<p>この選択によって、このブログにフロントエンド界隈のポストが増えてくると思います^^*</p>
+
+</div></section></main></body></html>

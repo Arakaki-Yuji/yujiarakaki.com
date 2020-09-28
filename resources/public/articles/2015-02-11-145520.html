@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">Vagrant、chef、 Dockerって最近よく聞くけどなにが違うの？</h1><div class="content">
+<h1>はじめに</h1>
+
+<p> 先日うちの会社のアルバイトに来てくれている大学生さんに 「<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>, chef, DockerってよくWebで記事を読むんですけど使っている文脈が似ていて、何が違っていてどう使い分けるのかよくわからないんですよね〜」という風に尋ねられました。</p>
+
+<p>その時に彼にも口頭で説明はしたのですが、うまく説明出来たのか自分でも怪しかったので今回まとめてみたいと思います。</p>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>とは</h1>
+
+<p> <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>について、 <a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>日本語ドキュメントには以下のように説明されています。</p>
+
+<blockquote><p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>は、 あなたとあなたのチームの生産性/柔軟性を最大限にする手助けをするために、 簡単な環境設定/複製可能なマシン/<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%C8%B3%A6%C9%B8%BD%E0">業界標準</a>の技術で構築された１つの一貫したワークフローによって制御される可搬的な開発環境を提供します。</p>
+
+<p>その恩恵を得る為に、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>は先人の知見に基づいています。 マシン(開発環境のマシン)は、ViretualBox, <a class="keyword" href="http://d.hatena.ne.jp/keyword/VMWare">VMWare</a>, <a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>, そのほかのプロバイダにより提供されます。 そして、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%A7%A5%EB%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">シェルスクリプト</a>/Chef/Puppet といった<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B6%C8%B3%A6%C9%B8%BD%E0">業界標準</a>的に提供されている<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>類は、 マシン上のソフトウェアを自動的にインストール/設定するために使用されます 。</p></blockquote>
+
+<p>ざっくりいうと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>とは仮想環境の設定・操作用統一<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>です。</p>
+
+<p>いままで開発用の仮想環境を作成しようとすると仮想環境用<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a> (<a class="keyword" href="http://d.hatena.ne.jp/keyword/VirtualBox">VirtualBox</a>や<a class="keyword" href="http://d.hatena.ne.jp/keyword/VMWare">VMWare</a>など)を使い、OSのイメージをダウンロード・インストール、初期設定などをいろいろ行って初めて仮想環境が構築できます。</p>
+
+<p>しかしそれをチームメンバーそれぞれが行うことでOSのバージョンの違い、仮想環境<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>の違い、仮想環境<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>の設定の違いなどが発生してしまい、みんなが同じ環境で開発を行うことが難しく手間がかかる作業でした。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>を使う場合 、それらの仮想環境の設定がすべて<strong>Vagrantfile</strong>という設定ファイルに記述され、 仮想環境の操作も<strong><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a></strong>という<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%DE%A5%F3%A5%C9%A5%E9%A5%A4%A5%F3">コマンドライン</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>経由で行います。</p>
+
+<p>仮想環境の設定が<strong>Vagrantfile</strong>経由で行われるため、チームメンバーに同じ環境を構築してほしい場合はその<strong>Vagrantfile</strong>を使ってその人も同じように<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>経由で仮想環境を起動すると同一の環境が簡単に手に入るということです。</p>
+
+<p>他にも<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>ではホストマシンとゲストマシン (<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で作成した仮想環境)の指定したディレクトリを同期する機能がデフォルトで簡単に利用できるため、いままで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B2%BE%C1%DB%A5%DE%A5%B7%A5%F3">仮想マシン</a>で開発を行っていた ローカルでファイル編集  => 仮想環境にアップ  => 仮想環境内で実行　というフローが ローカルでファイル編集=> 仮想環境で実行  という風に簡略化できます。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>はローカルマシンに構築する仮想環境の他にも<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>のEC2を<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>コマンドでコントロールすることも可能ですが、個人的には本番環境と開発環境を同じ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>で簡単に操作できるのは少し怖いところもあるので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>はあくまで開発環境の構築&amp;操作<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>として利用しています。</p>
+
+<h1>chefとは</h1>
+
+<p>chefについて、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%40IT">@IT</a>の記事では以下のように説明されています。</p>
+
+<blockquote><p>「Chef」とは、システム構築を自動化するためのソフトウェア<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>あるいは枠組み（<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>）の一種。システムの各種設定を変更したり、アプリケーションや<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DF%A5%C9%A5%EB%A5%A6%A5%A7%A5%A2">ミドルウェア</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DD%A1%BC%A5%CD%A5%F3%A5%C8">コンポーネント</a>などのソフトウェアをインストールしたりする作業を自動化できる。<a class="keyword" href="http://d.hatena.ne.jp/keyword/Windows">Windows</a>や<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Mac%20OS%20X">Mac OS X</a>など<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>のプラットフォームに対応している。</p></blockquote>
+
+<p>chefはざっくりいうとサーバー設定<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>です。</p>
+
+<p>例えば<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>をつかったWebアプリケーションを動作させるためのサーバーを設定しよう思うとWebサーバーとして<a class="keyword" href="http://d.hatena.ne.jp/keyword/Apache">Apache</a>をインストールし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>をインストールし、DBを使うなら<a class="keyword" href="http://d.hatena.ne.jp/keyword/MySQL">MySQL</a>などをインストールします。もちろんサーバーの構築はこれだけでは終わらず、セキュリティ用にネットワークの設定をいれたり、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>をインストールしたり、インストールした<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>群の設定などもそれぞれ行う必要があります。</p>
+
+<p>サーバーの設定を行うのが一台だけならまだ良いのですが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BE%E9%C4%B9%B2%BD">冗長化</a>するために<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CA%A3%BF%F4">複数</a>台サーバーを立てる場合に すべて手作業で行うのは効率が悪いのでそれらの設定作業をプログラミングで自動化しようというのがchefの役割です。</p>
+
+<p>他にもchefは冪等性(何回実行しても結果は同じ)という特徴をもっているため、すでに稼働しているサーバーに対して実行しても環境を壊すことなくchefで記述した環境に収束させます。</p>
+
+<p>そのためchefのコードを見るだけでサーバーの現在の状態が把握できるドキュメントの役割も果たしてくれます。</p>
+
+<h1>Dockerとは</h1>
+
+<p>Dockerについて、またまた<a class="keyword" href="http://d.hatena.ne.jp/keyword/%40IT">@IT</a>さんの記事では以下のように説明しています。</p>
+
+<blockquote><p>「Docker」とは、Docker社（旧dotCloud）が開発する<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AA%A1%BC%A5%D7%A5%F3%A5%BD%A1%BC%A5%B9">オープンソース</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%CA%A1%BC">コンテナー</a>管理ソフトウェアの1つです。</p></blockquote>
+
+<p>上記の説明で記載している通りDockerは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%CA%A1%BC">コンテナー</a>管理の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>であるため、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%CA%A1%BC">コンテナー</a>型仮想化技術と強く紐付いています。</p>
+
+<p>仮想化にはホスト型、 ハイパーバイザー型、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%CA%A1%BC">コンテナー</a>型と幾つか種類があり、上記で説明した<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>で使用している<a class="keyword" href="http://d.hatena.ne.jp/keyword/VirtualBox">VirtualBox</a>が行う仮想化はホスト型、<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>の EC2やさくら<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>など<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>サービスなどで使われる仮想化はハイパーバイザー型の仮想化です。</p>
+
+<p>それぞれの仮想化技術の詳細については長くなるため省略しますが、 <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%CA%A1%BC">コンテナー</a>型と他の仮想化との違いはその軽さです。</p>
+
+<p>他の仮想化技術は仮想的な「物理マシン」を作りだすというアプローチのため、物理マシンの上の仮想空間に独自の<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AB%A1%BC%A5%CD%A5%EB">カーネル</a>やOSなどをインストールしますが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%CA%A1%BC">コンテナー</a>型では物理マシンの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Linux">Linux</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AB%A1%BC%A5%CD%A5%EB">カーネル</a>は共有して、別々のユーザー空間を作り出すというアプローチを取っています。</p>
+
+<p>Dockerでは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%CA%A1%BC">コンテナー</a>型で作られた仮想環境をDockerfileという設定<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>を使って設定を入れ込んでいきます。
+それによってそのDockerfileを使えば同じ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%CA%A1%BC">コンテナー</a>型の仮想環境が作成できます。</p>
+
+<h1>それぞれの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>の関係</h1>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> &amp; chef</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>とchefはとくに一緒に語れることが多いので混同されやすいのですが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>は仮想環境の操作・設定<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>でchefはサーバー設定<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>です。
+よく使われるパターンだと<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>で作った仮想環境をWebアプリケーションが動作できるようにするためにchefで設定を入れる、のような感じです。</p>
+
+<p>「Vagrantfileでもサーバーの設定を入れる」と思ってしまうときがあるのですが、Vagrantfileではサーバーの設定を入れるために<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B7%A5%A7%A5%EB%A5%B9%A5%AF%A5%EA%A5%D7%A5%C8">シェルスクリプト</a>を使おうがchefを使おうがどちらでも構いません。 Vagrantfileで行うのは「このコマンドを使ってサーバーの設定をおこなう」という入り口を提供してくれているだけで、その設定<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>の選択肢のひとつとしてchefがあるという関係です。</p>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> &amp; Docker</h2>
+
+<p>まったく関係ありません。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>は仮想ハイパーバイザー型やホスト型仮想化<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>を通して仮想環境を操作するのに対して、Dockerは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%CA%A1%BC">コンテナー</a>型の仮想環境を操作します。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E6%A1%BC%A5%B9%A5%B1%A1%BC%A5%B9">ユースケース</a>が似ているため混同されるかもしれないですが、お互い対象としている仮想化技術が違うため組み合わせて使うことはまずないと思われます。</p>
+
+<h2>chef &amp; Docker</h2>
+
+<p>組み合わせて使うことも可能ですが、あまりメリットがないかもしれません。</p>
+
+<p>chefはサーバーを構築する際にその対象となる環境で<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a>とchefが実行できればサーバー設定を行うことが可能なので、Dockerで作った<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%CA%A1%BC">コンテナー</a>型仮想環境でも設定の自動化のために使用することは可能です。</p>
+
+<p>ただDocker自体にDockerfileというサーバーの設定を記述して自動化する機能を提供しているため、それをchefに置き換える必要があまりありません(既存のchefの資産が生かせるというメリットはありますが・・)</p>
+
+<p>さらにDockerで作成する<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%C6%A5%CA%A1%BC">コンテナー</a>型仮想化技術はプロセス内でその仮想環境が構築され、そのプロセスを消すと仮想環境自体もなくなるため基本的には毎回一からDockerfileを使って仮想環境を構築することになります。
+chefのメリットのひとつに冪等性がありますが、それが有効なのはすでにchefによってサーバーの設定が入っているところに何度も実行しても環境が同じであることを保証したいからです。
+Dockerのように毎回一から作成する環境の場合は何度も実行することがそもそもないので冪等性は不要になります。</p>
+
+<p>なのでDockerを使うのであればサーバーの設定もchefを使わずDockerで完結させる方が適切でしょう。</p>
+
+<h1>終わりに</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>, chef, Dockerがまだわからない人にざっくりとした説明ができるようにこの記事を書いてみました。</p>
+
+<p>本当はDockerの使いどころなども必要なので書きたいと思ったのですが、体力が尽きたのとそんな記事はいくらでもあるのと、何よりまだ自分が仕事で使っていないという理由で書くのは省略しちゃいました >&lt;</p>
+
+<p>Web開発の現場だとほとんど<a class="keyword" href="http://d.hatena.ne.jp/keyword/Vagrant">Vagrant</a>とchefに類似するサーバー設定<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>(Puppet, Ansibleなど)は使うのはもうスタンダードになっていて、Dockerはまだこれからだが確実にスタンダードになる技術っていう感じだと思います。</p>
+
+<p>Dockerを使う場合はアプリケーションの設計自体も変更が必要になる大きな変化なので、しっかりとキャッチアップしておきたいな。</p>
+
+<h1>参考URL</h1>
+
+<p><a href="http://lab.raqda.com/vagrant/why-vagrant/index.html">Vagrant&#x3092;&#x4F7F;&#x3046;&#x7406;&#x7531; | Vagrant&#x65E5;&#x672C;&#x8A9E;&#x30C9;&#x30AD;&#x30E5;&#x30E1;&#x30F3;&#x30C8;</a></p>
+
+<p><a href="http://www.atmarkit.co.jp/ait/articles/1408/11/news113.html">Windows Insider&#x7528;&#x8A9E;&#x89E3;&#x8AAC;&#xFF1A;Windows&#xFF0F;Linux&#x3067;&#x4F7F;&#x3048;&#x308B;&#x30B7;&#x30B9;&#x30C6;&#x30E0;&#x69CB;&#x7BC9;&#x30FB;&#x8A2D;&#x5B9A;&#x306E;&#x81EA;&#x52D5;&#x5316;&#x30C4;&#x30FC;&#x30EB;&#x300C;Chef&#x300D;&#x3068;&#x306F;&#xFF1F; - &#xFF20;IT</a></p>
+
+<p><a href="http://www.atmarkit.co.jp/ait/articles/1405/16/news032.html">&#x3044;&#x307E;&#x3055;&#x3089;&#x805E;&#x3051;&#x306A;&#x3044;Docker&#x5165;&#x9580;&#xFF08;1&#xFF09;&#xFF1A;&#x30A2;&#x30D7;&#x30EA;&#x958B;&#x767A;&#x8005;&#x3082;&#x30A4;&#x30F3;&#x30D5;&#x30E9;&#x7BA1;&#x7406;&#x8005;&#x3082;&#x77E5;&#x3063;&#x3066;&#x304A;&#x304D;&#x305F;&#x3044;Docker&#x306E;&#x57FA;&#x790E;&#x77E5;&#x8B58; - &#xFF20;IT</a></p>
+
+</div></section></main></body></html>

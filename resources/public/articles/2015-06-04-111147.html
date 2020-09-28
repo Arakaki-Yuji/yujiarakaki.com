@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">windows7でvagrant ssh コマンドが使えるようにする</h1><div class="content">
+<h1>はじめに</h1>
+
+<p><a href="http://arakaji.hatenablog.com/entry/2015/06/04/110512">windows7でvagrantを使う</a>の続きの記事です。</p>
+
+<p>もし<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>のインストールがまだであれば<a href="http://arakaji.hatenablog.com/entry/2015/06/04/110512">windows7でvagrantを使う</a>を試してみて下さい。</p>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>とは</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>とは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>で立ち上げた仮想環境に<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>で簡単にログインできるコマンドです。しかし<a class="keyword" href="http://d.hatena.ne.jp/keyword/Windows">Windows</a>ではデフォルトで<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>クライアントが入っていないため、このコマンドが使用出来ません。</p>
+
+<p>このままでは辛いので、どうにかして<a class="keyword" href="http://d.hatena.ne.jp/keyword/windows">windows</a>でも<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>が使えるようにします。</p>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/mingw">mingw</a>-getをインストールする</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Windows">Windows</a>上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/GNU/Linux">GNU/Linux</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%DE%A5%F3%A5%C9%A5%E9%A5%A4%A5%F3">コマンドライン</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>を使えるようにした<a href="http://www.mingw.org/">MinGW</a>というものがあります。
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/mingw">mingw</a>-getとは<a class="keyword" href="http://d.hatena.ne.jp/keyword/MinGW">MinGW</a>のパッケージ管理<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>のようなもので、これを使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>をインストールして使えるようにします。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/mingw">mingw</a>-getは<a href="http://sourceforge.net/projects/mingw/files/Installer/">ここ</a>から<a class="keyword" href="http://d.hatena.ne.jp/keyword/mingw">mingw</a>-get-setup.exeをダウンロードして、そのファイルを実行するとインストールが開始します。</p>
+
+<p><img src="https://qiita-image-store.s3.amazonaws.com/1260/26205/0be94023-ac3e-8073-9a28-2b3dae8a22d7.png" alt="MinGW   Minimalist GNU for Windows   Browse  Installer at SourceForge.net.png" /></p>
+
+<p>インストールの手順は、ここも説明に従って行えば問題ないです。</p>
+
+<p>インストールが完了すると<a class="keyword" href="http://d.hatena.ne.jp/keyword/MinGW">MinGW</a> Install Managerが起動されます。</p>
+
+<p><img src="https://qiita-image-store.s3.amazonaws.com/1260/26205/e0fb9743-5e26-6d62-d279-775bb5577f2c.png" alt="スクリーンショット 2015-06-02 18.03.41.png" /></p>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/MinGW">MinGW</a>用にPathを通す</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/MinGW">MinGW</a>でインストールされるコマンドなども<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>Pathを通さないと実行できません。
+なにも変更せずにインストールしていればC:\<a class="keyword" href="http://d.hatena.ne.jp/keyword/MinGW">MinGW</a>\binにコマンドをインストールされるのでこのパスをユーザー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>Pathに設定してください。</p>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/MinGW">MinGW</a>を使って基本ソフトウェアをインストールする</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/MinGW">MinGW</a>を使ったインストール方法は<a href="http://heroween.hateblo.jp/entry/2014/06/06/203440">このブログ</a>の詳しく乗っているので、このブログの「パッケージのインストール：<a class="keyword" href="http://d.hatena.ne.jp/keyword/GUI">GUI</a>編」を参考にしてください。</p>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/MinGW">MinGW</a>で<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>クライアントをインストールする</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/MinGW">MinGW</a> Install Managerを開いて右側にあるMSYSをクリックするとMSYSのパッケージがリストで表示されます。その中にmsys-opensshとmsys-opensslというパッケージがあるのでそれらにチェックをいれます。</p>
+
+<p>その後、左上メニューのInstallation->Apply Changesをクリックするとインストールが開始されます。</p>
+
+<h2>注意点</h2>
+
+<p>MSYSのパッケージはデフォルトだとC:\<a class="keyword" href="http://d.hatena.ne.jp/keyword/MinGW">MinGW</a>\msys\1.0\binにインストールされます。ここにもPathを通さないとコマンドが実行できないので、ユーザー<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B4%C4%B6%AD%CA%D1%BF%F4">環境変数</a>PathにC:\<a class="keyword" href="http://d.hatena.ne.jp/keyword/MinGW">MinGW</a>\msys\1.0\binを追記してください。</p>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>を試す</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>のインストールが完了しましたら、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%DE%A5%F3%A5%C9%A5%D7%A5%ED%A5%F3%A5%D7%A5%C8">コマンドプロンプト</a>を立ち上げ、Vagrantiflleがあるディレクトリに移動します。
+そこで<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> upで<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a>を起動し、<a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> <a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>コマンドを実行します。</p>
+
+<p>そこでエラーが発生せずに仮想環境の中にログインできたら成功です。</p>
+
+<p><img src="https://qiita-image-store.s3.amazonaws.com/1260/26205/284b2c66-22cd-8851-a7a9-c006e2fe4d09.png" alt="スクリーンショット 2015-06-02 18.44.17.png" /></p>
+
+<h1>さいごに</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/vagrant">vagrant</a> では<a class="keyword" href="http://d.hatena.ne.jp/keyword/rsync">rsync</a>コマンドも使うので<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>と同じ要領で<a class="keyword" href="http://d.hatena.ne.jp/keyword/rsync">rsync</a>コマンドをインストールしておいた方がいいです。
+ちなみに<a class="keyword" href="http://d.hatena.ne.jp/keyword/ssh">ssh</a>と同じようにMSYSにパッケージが入っています。</p>
+
+<h1>参考URL</h1>
+
+<ul>
+<li><a href="http://heroween.hateblo.jp/entry/2014/06/06/203440">Windows7にmingw-getでMSYSのsshとrsyncをインストールする</a></li>
+</ul>
+
+
+</div></section></main></body></html>

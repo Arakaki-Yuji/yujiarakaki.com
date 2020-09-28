@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">メール認証の仕組み、SPF(Sender Policy Framework)とは</h1><div class="content">
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Amazon">Amazon</a>のメール送信サービスである<a class="keyword" href="http://d.hatena.ne.jp/keyword/Amazon">Amazon</a> SES(Simple Email Service)を使おうと思って、サービスの説明を読んでいるときにSender Policy Frameworkという言葉でてきました。
+その意味をちゃんと理解しておきたいと思ったのでまとめておきます。</p>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/SPF">SPF</a>(Sender Policy Framework)とは</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SPF">SPF</a>とは、電子メールの送信元<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>が偽られていないかを検査するための仕組みです。</p>
+
+<p>メール送信で使用される<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%C8%A5%B3%A5%EB">プロトコル</a>である<a class="keyword" href="http://d.hatena.ne.jp/keyword/SMTP">SMTP</a>はメールアドレスを自由に設定することが出来るため、簡単に送信先を偽った「なりすましメール」を簡単に送ることができてしまいます。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SPF">SPF</a>はこのようななりすましを防ぐために<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>を使って認証を行なう技術です。</p>
+
+<h2>どのような仕組みか</h2>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SPF">SPF</a>に対応したメール受信サーバはメール受信時にそのメールの送信元となっている<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SPF">SPF</a>情報を<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>で問い合わせします。送信元のサーバが<a class="keyword" href="http://d.hatena.ne.jp/keyword/SPF">SPF</a>情報で許可されていない場合は、送信<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>が詐称されたと判断して受信を拒否するなどの処理をおこないます。</p>
+
+<h2><a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>に<a class="keyword" href="http://d.hatena.ne.jp/keyword/SPF">SPF</a>レコードはどのように登録するのか</h2>
+
+<p>先に<a class="keyword" href="http://d.hatena.ne.jp/keyword/SPF">SPF</a>情報は<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>のTXTレコードに記述します。</p>
+
+<p>設定例は以下:</p>
+
+<pre class="code" data-lang="" data-unlink>        IN     MX  10     mail.example.com
+        IN     TXT        “v-spf1 mx ~all&#34;
+mail    IN     A          11.22.33.44
+</pre>
+
+
+<p>設定内容は以下のような意味になります。</p>
+
+<pre class="code" data-lang="" data-unlink>v=spf1</pre>
+
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/spf">spf</a>の宣言を指定している。1は<a class="keyword" href="http://d.hatena.ne.jp/keyword/spf">spf</a>情報のバージョン1を使うことを宣言している。
+バージョン1を指定することで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Sender%20ID">Sender ID</a>との互換性を保持するメリットがあるので一般的にはspf1とするのが普通らしいです。</p>
+
+<pre class="code" data-lang="" data-unlink>mx</pre>
+
+
+<p>この<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>のメールアドレスは、ここでmxレコードに指定しているホストから送信されるという宣言をしている。</p>
+
+<pre class="code" data-lang="" data-unlink>~all</pre>
+
+
+<p>先の指定内容はほぼ全部という意味になる。</p>
+
+<pre class="code" data-lang="" data-unlink>-all</pre>
+
+
+<p>このように指定すると、完全全部という意味になる。もしmxレコードに指定しているホスト以外からメールを送信されていた場合は<a class="keyword" href="http://d.hatena.ne.jp/keyword/SPF">SPF</a>認証結果がFailとなり<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%D1%A5%E0%A5%E1%A1%BC%A5%EB">スパムメール</a>と判断されるようです。</p>
+
+<h1>まとめ</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SPF">SPF</a>とは、メール送信者が、誰かに自分のメール送信アドレスを偽られて<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%D1%A5%E0%A5%E1%A1%BC%A5%EB">スパムメール</a>を送信されないように、自分のメール送信アドレスを登録している<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>サーバーにどのIPからメールを送信しているかを記述する仕組みのことです。
+またメール受信サーバーによっては<a class="keyword" href="http://d.hatena.ne.jp/keyword/SPF">SPF</a>情報が<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>に登録されていないと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%D1%A5%E0%A5%E1%A1%BC%A5%EB">スパムメール</a>と判断することもあるようなのでメール送信サービスを行なうときは<a class="keyword" href="http://d.hatena.ne.jp/keyword/SPF">SPF</a>対応も考慮しないといけないですね。</p>
+
+<h1>参考リンク</h1>
+
+<p><a href="http://server-setting.info/blog/sender-policy-framework.html">http://server-setting.info/blog/sender-policy-framework.html</a>
+<a href="https://www.nic.ad.jp/ja/basics/terms/spf.html#two">https://www.nic.ad.jp/ja/basics/terms/spf.html#two</a></p>
+
+</div></section></main></body></html>

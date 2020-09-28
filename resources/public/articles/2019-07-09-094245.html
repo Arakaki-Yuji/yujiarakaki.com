@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">AzureのCosmosDBをREST API経由で操作するPHPライブラリを作った</h1><div class="content">
+<p>AzureのCosmosDBを使ったあれこれを作る過程で、CosmosDBのRESTAPIを叩く<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>ライブラリが必要になったので作りました。</p>
+
+<p>あんまり特別なことはしていないくて、ほんとにただ<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rest%20API">Rest API</a>をラップしたものです。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fgithub.com%2FArakaki-Yuji%2Fcosmosdb-client" title="Arakaki-Yuji/cosmosdb-client" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://github.com/Arakaki-Yuji/cosmosdb-client">github.com</a></cite></p>
+
+<h1>インストール</h1>
+
+<p>composer.<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>にarakaki-yuji/cosmosdb-clientを追加してください。</p>
+
+<pre class="code lang-json" data-lang="json" data-unlink>
+<span class="synSpecial">{</span>
+    &quot;<span class="synStatement">require</span>&quot;: <span class="synSpecial">{</span>
+        &quot;<span class="synStatement">arakaki-yuji/cosmosdb-client</span>&quot;: &quot;<span class="synConstant">^0.0.5</span>&quot;
+    <span class="synSpecial">}</span>
+<span class="synSpecial">}</span>
+</pre>
+
+
+<h1>使い方</h1>
+
+<h2>初期化</h2>
+
+<pre class="code lang-php" data-lang="php" data-unlink>
+$client = new \CosmosdbClient\CosmosdbClient($cosmosdbSecretKey, $cosmosdbAccountName);
+</pre>
+
+
+<h2>Databaseの操作</h2>
+
+<pre class="code lang-php" data-lang="php" data-unlink>// create database
+$client-<span class="synError">&gt;</span>database-<span class="synError">&gt;</span>create('database_id');
+
+// list database
+$client-<span class="synError">&gt;</span>database-<span class="synError">&gt;</span>list();
+
+// get database
+$client-<span class="synError">&gt;</span>database-<span class="synError">&gt;</span>get('database_id');
+
+// delete database
+$client-<span class="synError">&gt;</span>database-<span class="synError">&gt;</span>delete('database_id');
+</pre>
+
+
+<h2>Collectionの操作</h2>
+
+<pre class="code lang-php" data-lang="php" data-unlink>// create collection
+$indexingPolicy = ['indexingMode' =<span class="synError">&gt;</span> 'lazy'];
+$partitionKey = ['paths' =<span class="synError">&gt;</span> ['/Name']];
+$client-<span class="synError">&gt;</span>collection-<span class="synError">&gt;</span>create('database_id', 'collection_id', $indexingPolicy, $partitionKey);
+
+// list collection
+$client-<span class="synError">&gt;</span>collection-<span class="synError">&gt;</span>list('database_id');
+
+// get collection
+$client-<span class="synError">&gt;</span>collection-<span class="synError">&gt;</span>get('database_id', 'collection_id');
+
+// replace/update collection
+$client-<span class="synError">&gt;</span>collection-<span class="synError">&gt;</span>replace('database_id', 'collection_id', $indexingPolicy, $partitionKey);
+
+// delete collection
+$client-<span class="synError">&gt;</span>collection-<span class="synError">&gt;</span>delete('database_id', 'collection_id');
+</pre>
+
+
+<h2>Documentの操作</h2>
+
+<pre class="code lang-php" data-lang="php" data-unlink>// create document
+$doc = [
+    'id' =<span class="synError">&gt;</span> 1,
+    'name' =<span class="synError">&gt;</span> 'Yuji Arakaki',
+    'email' =<span class="synError">&gt;</span> 'example@test.com'
+];
+$partitionKeyValue = $doc['name'];
+$client-<span class="synError">&gt;</span>document-<span class="synError">&gt;</span>create('database_id', 'collection_id', $doc, $partitionKeyValue);
+
+// list document
+$client-<span class="synError">&gt;</span>document-<span class="synError">&gt;</span>list('database_id', 'collection_id');
+
+// get document
+$client-<span class="synError">&gt;</span>document-<span class="synError">&gt;</span>get('database_id', 'collection_id', $doc['id'], $partitionKeyValue);
+
+// replace/update document
+$client-<span class="synError">&gt;</span>document-<span class="synError">&gt;</span>replace('database_id', 'collection_id', $doc, $partitionKeyValue);
+
+// query document
+$query = &quot;SELECT * FROM c WHERE c.name = <span class="synPreProc">@name</span>&quot;;
+$parameters = [['name' =<span class="synError">&gt;</span> '<span class="synPreProc">@name</span>', 'value' =<span class="synError">&gt;</span> 'Yuji Arakaki']];
+$client-<span class="synError">&gt;</span>document-<span class="synError">&gt;</span>query('database_id', 'collection_id', $query, $parameters);
+
+// delete document
+$client-<span class="synError">&gt;</span>document-<span class="synError">&gt;</span>delete('database_id', 'collection_id', $doc['id'], $partitionKeyValue);
+</pre>
+
+
+<p>良いデザインかどうかはさておき、<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>のラッパーは筋力さえあれば誰でも作れる。</p>
+
+</div></section></main></body></html>

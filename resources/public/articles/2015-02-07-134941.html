@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">kumadori というgemを公開しました。</h1><div class="content">
+<h1>はじめに</h1>
+
+<p>仕事で<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>を使うようになってから5ヶ月程、前々から自分のgemをつくって公開したいと考えていました。</p>
+
+<p>非常に小さい単機能のgemですが、今回はじめて自作gemを作って公開できたのでそのご報告をしたいと思います。</p>
+
+<h1>kumadoriとはなにか？</h1>
+
+<p><a href="https://github.com/Arakaki-Yuji/kumadori">kumadori</a>は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ruby">Ruby</a>でデコレーターパターンをシンプルに実装するためのgemになります。</p>
+
+<p>デコレーターパターンとはプログラミングの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%B6%A5%A4%A5%F3%A5%D1%A5%BF%A1%BC%A5%F3">デザインパターン</a>のひとつで、既存のオブジェクトにデコレーターオブジェクトをラップすることで柔軟にオブジェクトの機能拡張を行なうことが出来る手法です。</p>
+
+<p>kumadoriという名前ですが、歌舞伎の化粧のことを隈取(くまどり)ということから命名しました。</p>
+
+<p>個人的にソフトウェアの名前に日本語が使われているのが結構好きなので、デコレーターを表すなんか良い感じの日本語ないかな〜って考えた所、
+デコレーター -> 装飾者 -> おしゃれする -> 化粧 -> 歌舞伎の化粧を「隈取」という無理な連想ゲームでkumadoriという名前にしました。</p>
+
+<h1>使い方</h1>
+
+<p>kumadoriはデコレーションの対象となる<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>のClass名によって自動的に使用するDecoratorクラスを決定します。</p>
+
+<p>例えばUserクラスの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>をデコレーションするのはUserDecoratorクラス、Animalクラスの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>のデコレーションを行なうのはAnimalDecoratorクラスのような感じになります。
+そのため、使用するDecoratorクラスを予めKumadori::BaseDecoratorクラスを継承して定義して下さい。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>をデコレーションするときはKumadori.decorate(instance)<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BD%A5%C3%A5%C9">メソッド</a>を使います。</p>
+
+<p>以下に参考コードを記載します。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink>
+<span class="synComment">#</span>
+<span class="synComment"># Basic ruby class.</span>
+<span class="synComment">#</span>
+<span class="synPreProc">class</span> <span class="synType">User</span>
+  attr_accesstor <span class="synConstant">:first_name</span>, <span class="synConstant">:last_name</span>
+
+  <span class="synPreProc">def</span> <span class="synIdentifier">initialize</span>(first_name, last_name)
+    <span class="synConstant">self</span>.first_name = first_name
+    <span class="synConstant">self</span>.last_name  = last_name
+  <span class="synPreProc">end</span>
+<span class="synPreProc">end</span>
+
+<span class="synComment">#</span>
+<span class="synComment"># Decorator class for User instance.</span>
+<span class="synComment">#</span>
+<span class="synPreProc">class</span> <span class="synType">UserDecorator</span> &lt; <span class="synType">Kumadori</span>::<span class="synType">BaseDecorator</span>
+  <span class="synPreProc">def</span> <span class="synIdentifier">full_name</span>
+    <span class="synSpecial">&quot;#{</span><span class="synConstant">self</span>.last_name<span class="synSpecial">}</span><span class="synConstant"> </span><span class="synSpecial">#{</span><span class="synConstant">self</span>.first_name<span class="synSpecial">}&quot;</span>
+  <span class="synPreProc">end</span>
+<span class="synPreProc">end</span>
+
+user = <span class="synType">User</span>.new(<span class="synSpecial">'</span><span class="synConstant">Yuji</span><span class="synSpecial">'</span>, <span class="synSpecial">'</span><span class="synConstant">Arakaki</span><span class="synSpecial">'</span>)
+
+<span class="synComment"># user instance decorated by UserDecorator</span>
+decorated_user = <span class="synType">Kumadori</span>.decorate(user)
+
+decorated_user.full_name <span class="synComment"># =&gt; &quot;Arakaki Yuji&quot;</span>
+</pre>
+
+
+<p>もしデコレーションする<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>に該当するDecoratorクラスがない場合、Kumadori::BaseDecoratorクラスによってデコレーションされます。</p>
+
+<p>そのため、もしどのオブジェクトにも共通して追加させたい<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BD%A5%C3%A5%C9">メソッド</a>などがあれば、Kumadori::BaseDecoratorクラスをOverrideして定義してください。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink>
+<span class="synPreProc">class</span> <span class="synType">Animal</span>
+<span class="synPreProc">end</span>
+
+<span class="synPreProc">module</span> <span class="synType">Kumadori</span>
+  <span class="synPreProc">class</span> <span class="synType">BaseDecorator</span> &lt; ::<span class="synType">SimpleDelegator</span>
+    <span class="synPreProc">def</span> <span class="synIdentifier">live?</span>
+      <span class="synConstant">true</span>
+    <span class="synPreProc">end</span>
+  <span class="synPreProc">end</span>
+<span class="synPreProc">end</span>
+
+animal = <span class="synType">Animal</span>.new
+
+
+<span class="synComment"># Because of AnimalDecorator class is not defiend,</span>
+<span class="synComment"># it is decorated by Kumadori::BaseDecorator</span>
+decorated_animal = <span class="synType">Kumadori</span>.decorate(animal)
+
+decorated_animal.live? <span class="synComment"># =&gt; true</span>
+</pre>
+
+
+<p>配列などのCollection内に入っている各要素をすべてデコレーションしたい場合はKumadori.collection_decorate(collection)を使ってください。</p>
+
+<p>Collection内に入っている要素をすべてデコレーションした新しいCollectionを返します。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink>members = []
+members &lt;&lt; <span class="synType">User</span>.new(<span class="synSpecial">'</span><span class="synConstant">Kanoko</span><span class="synSpecial">'</span>, <span class="synSpecial">'</span><span class="synConstant">Higa</span><span class="synSpecial">'</span>)
+members &lt;&lt; <span class="synType">User</span>.new(<span class="synSpecial">'</span><span class="synConstant">Ai</span><span class="synSpecial">'</span>, <span class="synSpecial">'</span><span class="synConstant">Kawasaki</span><span class="synSpecial">'</span>)
+members &lt;&lt; <span class="synType">User</span>.new(<span class="synSpecial">'</span><span class="synConstant">Takeo</span><span class="synSpecial">'</span>, <span class="synSpecial">'</span><span class="synConstant">Kikuchi</span><span class="synSpecial">'</span>)
+
+decorated_members = <span class="synType">Kumadori</span>.collection_decorate(members)
+
+decorated_members.map{ |<span class="synIdentifier">user</span>| user.full_name} <span class="synComment"># =&gt; [&quot;Higa Kanoko&quot;, &quot;Kawasaki Ai&quot;, &quot;Kikuchi Takeo&quot;]</span>
+</pre>
+
+
+<h1>このGemの使いドコロ</h1>
+
+<p>僕がこのGemを作ったのは、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>でモデルに格納されているデータをフォーマットして表示する処理を定義するときに、表示に関する処理は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>ロジックではないのであまりモデル内には記載したくないが記述する良い場所がないのでDecoratorというレイヤーを作りたいと考えたからです。</p>
+
+<p>Decoratorというレイヤーを入れることで、モデル記述していた表示に関する<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E1%A5%BD%A5%C3%A5%C9">メソッド</a>が整理できるのでより見通しが良くなり、変更もDocoratorを変更すればモデル自体を変更せずに済むのでより柔軟性が高まります。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>にDocoratorというレイヤーを導入するGemは<a href="https://github.com/amatsuda/active_decorator">active_decorator</a>や<a href="https://github.com/drapergem/draper">draper</a>という有名どころのgemもあるのですが、どちらも<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%B0%A5%A4%A5%F3">プラグイン</a>になっているため<a class="keyword" href="http://d.hatena.ne.jp/keyword/Rails">Rails</a>依存しない形式でデコレーターを簡単に使えるgemにすればすぐに実装出来るしより使いやすいと思ってkumadoriを作ってみました。(まあ、あとで調べるとそういうgemは山ほどあったのですが・・)</p>
+
+<h1>おわりに</h1>
+
+<p>超絶シンプルなgemですが、人生初の<a class="keyword" href="http://d.hatena.ne.jp/keyword/OSS">OSS</a>を公開したということでほんの少しテンションが上がっています^^</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/OSS">OSS</a>ということでコミットメッセージやREADMEも英語で書いたり、テストどれくらい書けば良いか考えたりして色々楽しかったです。</p>
+
+<p>これからも小さいgemでも大きい<a class="keyword" href="http://d.hatena.ne.jp/keyword/Web%A5%B5%A1%BC%A5%D3%A5%B9">Webサービス</a>でも良いので色々開発して定期的にアウトプット出来るように頑張りますd^^</p>
+
+</div></section></main></body></html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">chefに疲れたあなたにはItamaeがおすすめ！</h1><div class="content">
+<h1>chef使うのめんどくさくないですか？</h1>
+
+<p>私はいままでサーバーの設定を自動化するための<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>にchefを使っていました。
+最初chefを使い始めた時は、いままで手作業でやっていたことがコード化・自動化できるので「お、便利ー！chef最高！」という感じだったのですが、
+だんだん使っていくうちにchefが高機能が故に自分の用途としては使うのが辛くなってきました。</p>
+
+<h2>そもそも自分はchef soloしか使わない</h2>
+
+<p>chef は基本的にはchef-server - chef-client という構成で、設定を自動で行いたいサーバーに対してchef-clientをインストールします。
+そして対象のサーバーの設定をコード化したrecipeを保持するchef-serverとchef-clientが通信して対象サーバーにrecipeを適応します。</p>
+
+<p>このchef-serverを立てずにchef-clientだけでサーバーの設定を自動化するchef-soloという機能があり、それは自分の手元のマシンから<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSH">SSH</a>経由でchef-clientにrecipeを送信・適応させるのですが自分の場合はそもそもこれしか使っていません。</p>
+
+<p>管理しているサーバーが何十台もあって常に稼働している場合はchef-serverがあって自動でrecipeを適応させる機能も価値があるかもしれないですが、自分の場合は管理対象のサーバーがそもそも多くないからです。</p>
+
+<h2>覚えることが多過ぎる</h2>
+
+<p>一つのサーバーの設定を管理するchefの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>を作るためにchefだけでなくなく、コミュニティが作ったrecipeの依存管理をするBerkshelf、chef-soloを使うための<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%DE%A5%F3%A5%C9%A5%E9%A5%A4%A5%F3">コマンドライン</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>knife-soloなど、なんだかんだで必要な<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>を覚えるために結構な学習コストがかかります。</p>
+
+<h2>最近はchef-soloではなく、chef-zeroだと言い出している</h2>
+
+<p>自分はそもそもchef-soloしか使っていないのに、そのchef-soloが終わりchef-zeroを使って欲しいそうです。</p>
+
+<p>詳しい内容は以下のブログを参照してください。</p>
+
+<p><a href="https://www.getchef.com/blog/2014/06/24/from-solo-to-zero-migrating-to-chef-client-local-mode/">From Solo to Zero: Migrating to Chef Client Local Mode | Chef Blog</a></p>
+
+<p>いまからまた新しいchef-zeroとかのプラクティスを学ぶのが辛いです。。。</p>
+
+<h2>もっとシンプルな<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>が欲しい！</h2>
+
+<p>chefは大規模にサーバーを管理している人にとっては学習コストに見合うメリットがある<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>なはずだけど 、自分にとって<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AA%A1%BC%A5%D0%A1%BC%A5%B9%A5%DA%A5%C3%A5%AF">オーバースペック</a>過ぎました。
+もっと単純に、ホストマシンでコマンド実行したら対象サーバーにrecipeを適応するだけの、シンプルな<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>が欲しいと思って調査し始めました。</p>
+
+<h1><a href="https://github.com/itamae-kitchen/itamae">Itamae</a>はシンプルで使いやすい！</h1>
+
+<p>Itamaeはchefのような<a class="keyword" href="http://d.hatena.ne.jp/keyword/DSL">DSL</a>で、 よりシンプルな機能だけを実装した<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>です。</p>
+
+<p>たとえば、以下のように<a class="keyword" href="http://d.hatena.ne.jp/keyword/httpd">httpd</a>をインストールするrecipeを作成します。</p>
+
+<pre class="code lang-ruby" data-lang="ruby" data-unlink>package <span class="synSpecial">'</span><span class="synConstant">httpd</span><span class="synSpecial">'</span> <span class="synStatement">do</span>
+  action <span class="synConstant">:install</span>
+<span class="synStatement">end</span>
+</pre>
+
+
+<p>このrecipeを対象サーバーに適応するには以下のコマンドを実行します。</p>
+
+<pre class="code" data-lang="" data-unlink>$ itamae ssh -h 192.168.10.10 -p 22 -u user -i /path/to/private_key recipe.rb</pre>
+
+
+<p>オプションが多いですが、やっていることは明白で-h で対象サーバーのホストを指定し、-pでポートを指定、-uで接続ユーザーを指定、-i で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C8%EB%CC%A9%B8%B0">秘密鍵</a>を指定、最後に適応させるrecipeファイルを指定します。</p>
+
+<p>chefのようにnodeによって値を変えたい場合は、以下のように-jオプションで利用する<a class="keyword" href="http://d.hatena.ne.jp/keyword/json">json</a>ファイルを指定すればいいだけです。</p>
+
+<pre class="code" data-lang="" data-unlink>$ itamae ssh -j node.json -h 192.168.10.10 -p 22 -u user -i /path/to/private_key recipe.rb</pre>
+
+
+<p>ちゃんと知りたい場合は<a class="keyword" href="http://d.hatena.ne.jp/keyword/Github">Github</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%DD%A5%B8%A5%C8%A5%EA">レポジトリ</a>の<a href="https://github.com/itamae-kitchen/itamae/wiki">wiki</a>を見れば、推奨されるベストプラクティスから使い方までちゃんと記載されていますし、量も少ないのですぐに使えるレベルまで学習できます。</p>
+
+<p>自分のようなchefに疲れた人にとって、itamaeはchefで学んだ知識もある程度活かせ、かつ簡単に使えるベストな<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C4%A1%BC%A5%EB">ツール</a>です！</p>
+
+<p>さらに嬉しいのはchefは対象サーバーに<a class="keyword" href="http://d.hatena.ne.jp/keyword/ruby">ruby</a> + chefをインストールしないといけないですが、itamaeはその必要もないのです。</p>
+
+<p>もし他にもchefに疲れた人がいらっしゃれば、ぜひ<a href="https://github.com/itamae-kitchen/itamae">itamae</a>をオススメします。</p>
+
+</div></section></main></body></html>

@@ -1,5 +1,7 @@
 (ns docsite.import
-  (:require [clojure.string :as string]))
+  (:require [clojure.string :as string]
+            [docsite.templates.article :as article-page]
+            [docsite.config :refer [public-articles-path]]))
 
 (defn- split-by-page [import-text]
   (string/split import-text
@@ -46,3 +48,11 @@
   (string/replace (get-in page-data [:meta "BASENAME"])
                   #"\/"
                   "-"))
+(defn hatenablog-import [import-file-path]
+  (let [pages (parse import-file-path)]
+    (for [p pages]
+      (spit (str public-articles-path "/" (page-name p) ".html")
+            (article-page/page (:body p) (get-in p [:meta "TITLE"])))
+      )
+    )
+  )

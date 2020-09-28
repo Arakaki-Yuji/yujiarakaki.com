@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">SQLマイグレーションツール「mig」に、同名のテーブル、カラム、インデックスを作成しようとしたというエラーの場合はマイグレーションをスキップするというオプションを追加しました。</h1><div class="content">
+<p>以前ブログでも紹介したこともある、<a class="keyword" href="http://d.hatena.ne.jp/keyword/PHP">PHP</a>製のシンプルな<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>ツール「mig」ですが、こちら社内のDB<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>ツールとして絶賛使用中で、実は地道に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%B0%A5%D5%A5%A3%A5%C3%A5%AF%A5%B9">バグフィックス</a>や機能追加を行っています。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=http%3A%2F%2Farakaji.hatenablog.com%2Fentry%2F2018%2F12%2F07%2F000527" title="Webフレームワークに依存しない、PHP製のシンプルなSQL マイグレーションツール「Mig」を作った。 - ゆーじのろぐ" class="embed-card embed-blogcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 190px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://arakaji.hatenablog.com/entry/2018/12/07/000527">arakaji.hatenablog.com</a></cite></p>
+
+<p>その中で、メンバーからの要望があり追加した機能について紹介します。</p>
+
+<h1>同名のテーブル、カラム、インデックスを作成しようとしたというエラーが出た場合<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>をスキップするオプション「skip-duplicate-and-exists-errors」</h1>
+
+<p>migで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>用<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>ファイルを作成するとファイル名の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%EC%A5%D5%A5%A3%A5%C3%A5%AF%A5%B9">プレフィックス</a>としてタイムスタンプが付与され、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を実行するとその<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>ファイルのタイムスタンプがmigrationsテーブルに追加されます。
+<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>を実行するときには、このテーブルのレコードを見て実行していない<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を判断し実行しています。</p>
+
+<p>しかし、例えばどこかの環境のDBの<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>ダンプを取得してそれを実行して作ったDBの場合、その<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>ダンプ内にmigrationsテーブルが含まれていなければすでにテーブルやカラム、インデックスが作成されているのにそれらを作成をする<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を実行しようとしてエラーが発生します。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>実行時に「skip-duplicate-and-exists-errors」というオプションをつけると、同名のテーブル、カラム、インデックスを作成しようとしたというエラーの場合は、この<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>は実行したものとみなしてmigrationsテーブルにレコードを追加してスキップするという機能を追加しました。</p>
+
+<pre class="code" data-lang="" data-unlink>$ mig-cli migrate skip-duplicate-and-exists-errors</pre>
+
+
+<h2>なぜ追加したのか？</h2>
+
+<p>うちの開発チームではmigの利用は開発環境に限定していて、本番環境へは手動で<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>を実行しています。</p>
+
+<p>理由は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BD%A1%BC%A5%B9%A5%B3%A1%BC%A5%C9">ソースコード</a>の変更と違い、DBへの変更はパフォーマンスへの影響も大きく実行順番やタイミングの調整も行いたいため、あえて手動で実行しています。</p>
+
+<p>つまり、本番DBにはmigで使うmigrationsテーブルがありません。</p>
+
+<p>以前「Paykeの技術基盤チームの取り組み」という内容で発表をしたこともあるのですが、Paykeでは開発環境にもほぼ本番同等のデータを使うようにしているため定期的に本番に類似したデータのdumpファイルを取り込んでいます。</p>
+
+<p><iframe id="talk_frame_493386" src="//speakerdeck.com/player/e13f1e54a4b74e01af1d37bb725648ce" width="710" height="399" style="border:0; padding:0; margin:0; background:transparent;" frameborder="0" allowtransparency="true" allowfullscreen="allowfullscreen" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe><cite class="hatena-citation"><a href="https://speakerdeck.com/ug/paykefalseji-shu-ji-pan-timufalsequ-rizu-mi?slide=27">speakerdeck.com</a></cite></p>
+
+<p>そのたびにmigrationsテーブルと実際の各テーブルの構成が変わってしまい、migで不要なエラーが発生して<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%A4%A5%B0%A5%EC%A1%BC%A5%B7%A5%E7%A5%F3">マイグレーション</a>が進まないという問題が発生しておりました。</p>
+
+<p>この問題を解決するため、「skip-duplicate-and-exists-errors」というオプションを追加することにしました。</p>
+
+<h2>ソフトウェアは使うと磨かれる</h2>
+
+<p>migは小さなソフトウェアですが、ホントに自分たちの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E6%A1%BC%A5%B9%A5%B1%A1%BC%A5%B9">ユースケース</a>として必要だから開発して、それを実際に利用し、そのフィードバックをもとに少しづつ改善しています。</p>
+
+<p>実際に自分で使ってみるだけだと今回のような機能は思いつかなかったですが、実際チームで使うなかでフィードバックがあって開発することができました。</p>
+
+<p>この機能以外にも、一つの<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>ファイルに複数の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>文が入っていても実行できるようにしたり、<a class="keyword" href="http://d.hatena.ne.jp/keyword/SQL">SQL</a>ファイルの最後に複数の改行が入っている実行に失敗してしまうというバグを修正したりと、地味だけど着実に改善しています。</p>
+
+<p>やはりソフトウェアは開発してリリースするだけだとだめで、実際使われてフィードバックを得ないと磨かれていかないのだと実感しました。</p>
+
+<p>migはおそらくうちの社内だけで使っているソフトウェアですが、いつか世界中の人に使われて自分の名刺代わりになるようなソフトウェアを作っていけるように今後もコツコツやっていきます。</p>
+
+</div></section></main></body></html>

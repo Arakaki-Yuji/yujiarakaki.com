@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">Azure CDNでWBS砲を迎え撃つ</h1><div class="content">
+<p>先日、<a class="keyword" href="http://d.hatena.ne.jp/keyword/WBS">WBS</a>(<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EF%A1%BC%A5%EB%A5%C9%A5%D3%A5%B8%A5%CD%A5%B9%A5%B5%A5%C6%A5%E9%A5%A4%A5%C8">ワールドビジネスサテライト</a>)に僕が所属している会社が取材され、短い時間ですが放送の中で紹介されました。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=http%3A%2F%2Fwww.tv-tokyo.co.jp%2Fmv%2Fwbs%2Fnewsl%2Fpost_163597%2F" title="30日投開票の沖縄県知事選　地元経済人が語る本音…：ワールドビジネスサテライト" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="http://www.tv-tokyo.co.jp/mv/wbs/newsl/post_163597/">www.tv-tokyo.co.jp</a></cite></p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%B2%AD%C6%EC%B8%A9%C3%CE%BB%F6">沖縄県知事</a>戦を関連した、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B2%AD%C6%EC%B8%A9">沖縄県</a>で注目のIT<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D9%A5%F3%A5%C1%A5%E3%A1%BC">ベンチャー</a>・スタートアップとしてPaykeが紹介され、時間としては大体2分間程度だったのですが、テレビ放送ということもあり会社サイトにアクセスが急増することを想定してAzure <a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>を使って対策を行いました。(放送があることがわかったのは、放送日前日の午後３時...)</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fazure.microsoft.com%2Fja-jp%2Fservices%2Fcdn%2F" title="Content Delivery Network (CDN) | Microsoft Azure" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://azure.microsoft.com/ja-jp/services/cdn/">azure.microsoft.com</a></cite></p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>とは世界中に分散しているエッジサーバー上でコンテンツをキャッシュし、オリジナルのサーバーへのアクセスが届く前にエッジサーバーでレスポンスを返すことにより負荷分散とレスポンスの高速化を行うためのサービスです。</p>
+
+<p>Azureの<a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>の特徴として、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Microsoft">Microsoft</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Akamai">Akamai</a>、Verizonが提供する<a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>サービスが選択できます。
+それぞれ特徴が違うので、自分たちの用途にあったサービスを選ぶことができます。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fdocs.microsoft.com%2Fja-jp%2Fazure%2Fcdn%2Fcdn-features" title="Azure Content Delivery Network (CDN) 製品の機能の比較" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://docs.microsoft.com/ja-jp/azure/cdn/cdn-features">docs.microsoft.com</a></cite></p>
+
+<p>今回は静的コンテンツだけでなくサイト全体を<a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>でキャッシュして配信したかったため、そのためには<a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>側で<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSL">SSL</a>解決を行う必要がありました。
+独自証明書を使いたかったので、それが使える Azure <a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a> Standard from <a class="keyword" href="http://d.hatena.ne.jp/keyword/Microsoft">Microsoft</a>を選択しました。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>に独自証明書をアップロードするときですが、書式を<a class="keyword" href="http://d.hatena.ne.jp/keyword/pki">pki</a>形式に変換しないといけません。</p>
+
+<p>証明書のcerファイルを以下のコマンドを使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/pki">pki</a>形式に変換します。</p>
+
+<pre class="code" data-lang="" data-unlink>$ openssl pkcs7 -in {common_name}.cer -outform PEM -out {common_name}.pem -print_certs</pre>
+
+
+<p>以下ページも参考にしてみてください。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Frms-digicert.ne.jp%2Fhowto%2Fbasis%2Fopenssl-get-pxf.html" title="SSLサーバ証明書 : OpenSSLを使って.pfxファイル証明書を作成する方法 \ DigiCert" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://rms-digicert.ne.jp/howto/basis/openssl-get-pxf.html">rms-digicert.ne.jp</a></cite></p>
+
+<h1>すでに稼働している<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>を<a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>に向ける場合の注意点</h1>
+
+<p>たとえばwww.sample.comというサイトを<a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>配信するためには、<a class="keyword" href="http://d.hatena.ne.jp/keyword/DNS">DNS</a>の設定でwww.sample.comのCNAMEの向き先を<a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>にする必要があります。
+新しいサイトの場合は問題ないのですが、すでに稼働しているサイトの場合に使用している<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>の向き先をいきなり切り替えると、<a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>側に設定が反映されるまでのタイムラグの間サイトが表示されなくなってしまいます。</p>
+
+<p>Azure <a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>ではそのようなケースのためにcdnverify <a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B5%A5%D6%A5%C9%A5%E1%A5%A4%A5%F3">サブドメイン</a>をマップすることで<a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>側の設定を事前に反映させることができます。
+こちらのドキュメントを参考に設定してみてください。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fdocs.microsoft.com%2Fja-jp%2Fazure%2Fcdn%2Fcdn-map-content-to-custom-domain%23map-the-temporary-cdnverify-subdomain" title="チュートリアル - カスタム ドメインを Azure CDN エンドポイントに追加する" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://docs.microsoft.com/ja-jp/azure/cdn/cdn-map-content-to-custom-domain#map-the-temporary-cdnverify-subdomain">docs.microsoft.com</a></cite></p>
+
+<h1>オリジンとなるサイトが<a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a>の場合の注意点</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a>の場合、サイトの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>がデータベース登録されているため、その<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>以外からのアクセスだとリダイレクトがかかるケースがあります。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/wordpress">wordpress</a>に登録しているサイト<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>は<a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>を向き、<a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>からは別の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C9%A5%E1%A5%A4%A5%F3">ドメイン</a>をつかってオリジンサーバーへはアクセスすることになるため、wp-config.<a class="keyword" href="http://d.hatena.ne.jp/keyword/php">php</a>の中で以下のようなコードを入れて、意図しないリダイレクトが発生しないように調整しました。</p>
+
+<pre class="code" data-lang="" data-unlink>if($_SERVER[&#39;HOST_NAME&#39;] === &#39;origin.sample.com&#39;){
+   $_SERVER[&#39;HOST_NAME&#39;] = &#39;www.sample.com&#39;;
+}
+</pre>
+
+
+<h1>結果</h1>
+
+<p>通常時の100倍以上のユーザーがサイトに訪れましたが、なんのトラブルもなく正常にサーバー稼働し続けましたので、今回の対策は無事成功したと思います。</p>
+
+<p>実は今回がはじめての<a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>利用だったのですが、静的コンテンツの大量のアクセス増にすばやく対応するのに、<a class="keyword" href="http://d.hatena.ne.jp/keyword/CDN">CDN</a>はさいつよですね。</p>
+
+</div></section></main></body></html>

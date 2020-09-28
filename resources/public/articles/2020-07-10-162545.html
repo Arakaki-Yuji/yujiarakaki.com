@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">Clojure/leiningenでユニットテストを実行する</h1><div class="content">
+<p>leiningenを使っているプロジェクトで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E6%A5%CB%A5%C3%A5%C8%A5%C6%A5%B9%A5%C8">ユニットテスト</a>を実行する方法について整理します。</p>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E6%A5%CB%A5%C3%A5%C8%A5%C6%A5%B9%A5%C8">ユニットテスト</a>を実行する</h1>
+
+<pre class="code :bash" data-lang=":bash" data-unlink>$ lein test
+</pre>
+
+
+<h1>特定のnamespaceの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E6%A5%CB%A5%C3%A5%C8%A5%C6%A5%B9%A5%C8">ユニットテスト</a>だけ実行する</h1>
+
+<pre class="code :bash" data-lang=":bash" data-unlink>$ lein test sample-app.core-test</pre>
+
+
+<h1>テストをメタキーワードでグルーピングして、そのグループのテストだけを実行する</h1>
+
+<p>project.cljにtest-selectorsを追加する</p>
+
+<pre class="code :project.clj" data-lang=":project.clj" data-unlink> .
+ .
+ :test-selectors {:api :api
+                  :model :model
+                  :core :core)}
+ .</pre>
+
+
+<p>テストコードにキーワードを指定する</p>
+
+<pre class="code :test/sample_app/core_test.clj" data-lang=":test/sample_app/core_test.clj" data-unlink> (ns ^:core sample-app.core-test
+    (require [clojure.test :refer :all]
+        [sample-app.core :refer :all]))
+ 
+ (deftest ^:api a-test
+    (testing &#34;TEST A&#34; 
+        (is (= 1 (+ 1 1)))))
+        
+  (deftest ^:model b-test
+    (testing &#34;TEST B&#34; 
+        (is (= 1 (- 2 1)))))</pre>
+
+
+<p>キーワードを指定して  lein testを実行する</p>
+
+<pre class="code :bash" data-lang=":bash" data-unlink># :modelメタキーワードが設定されたb-testだけ実行
+$ lein test :model 
+ 
+# :apiメタキーワードが設定されたa-testだけ実行
+$ lein test :api
+ 
+# :coreメタキーワードが設定されたsample-app.core-testに含まれるa-testとb-testが実行される
+$ lein test :core
+</pre>
+
+
+<h1>特定の関数だけテストする</h1>
+
+<pre class="code" data-lang="" data-unlink>$ lein test :only sample-app.core-test/a-test</pre>
+
+
+</div></section></main></body></html>

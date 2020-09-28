@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">AWSユーザーにも知ってほしい、Azure Web AppがWordPressを乗せるのに最高という話</h1><div class="content">
+<h1>Azure Web Appとは</h1>
+
+<p>Azure Web AppとはAzureが提供しているPaaSの一つです。
+その名の通りWebアプリを乗せるために適したPaaSで、負荷分散や自動スケーリング、またGit等を利用した継続的デプロイなどの機能も提供しています。</p>
+
+<p>対応している言語が2019/1/20現在で以下のようになっています。</p>
+
+<p><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/a/arakaji-yuu/20190120/20190120182551.png" alt="f:id:arakaji-yuu:20190120182551p:plain" title="f:id:arakaji-yuu:20190120182551p:plain" class="hatena-fotolife" itemprop="image"></span></p>
+
+<h1><a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a>をPaaSに乗せる上での課題</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a>に限らないのですが、PaaSにWebアプリを乗せるときにはWebアプリ自体を「ステートレス」にしないといけません。
+ステートレスとはその名の通り状態を持たないようにすることで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a>の例でいうと管理画面からアップロードする写真やインストールする<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%B0%A5%A4%A5%F3">プラグイン</a>がそれに値します。</p>
+
+<p>PaaSはスケールアウトとスケールインといって、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>を増やしたり減らしたり出来ることが大きな魅力の一つです。
+しかし一つのサーバーの中に画像や<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%B0%A5%A4%A5%F3">プラグイン</a>のファイルが配置されていると他のサーバーからそのファイルが参照できないためにスケールアウトできません。</p>
+
+<p>そのためPaaSに<a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a>を乗せる場合には画像を専用サービス(例: S3)に送信したり、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%B0%A5%A4%A5%F3">プラグイン</a>をgit管理して管理画面からは更新やインストールをしないようにするなどの運用にする必要があります。</p>
+
+<p>しかし、画像をS3にアップロードするように修正するのも<a class="keyword" href="http://d.hatena.ne.jp/keyword/%B9%A9%BF%F4">工数</a>がかかりますし、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%B0%A5%A4%A5%F3">プラグイン</a>をgit管理する場合は<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%B0%A5%A4%A5%F3">プラグイン</a>のインストールを開発チームが行わないといけなくなります。</p>
+
+<h1>Azure Web Appの何が<a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a>に適しているのか？</h1>
+
+<p>Azure Web Appは状態があるWebアプリでもスケールアウトすることができる特徴があり、そのため<a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a>に乗せるのに特別な改修をする必要がありません。</p>
+
+<p>利用者側が気にすることはないですが、Azure Web Appの内部はざっくりいうと<a class="keyword" href="http://d.hatena.ne.jp/keyword/Web%20Workers">Web Workers</a>とFile Workersに分かれています。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Web%20Workers">Web Workers</a>が実際にリク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A8%A5%B9">エス</a>トを処理しプログラムが動作するサーバーになります。スケールアウトをして<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>数を増やすとこの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Web%20Workers">Web Workers</a>の数が増えます。</p>
+
+<p>File Serversはhtmlやjs、画像やデプロイされるコードなどのファイル類が配置されているサーバーになります。これはAzure Storage Blobsがマウントされており、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Web%20Workers">Web Workers</a>はFile Serversにnetwork driver越しにアクセスしています。</p>
+
+<p>例えば<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>が3つに設定されたWebAppに載せた<a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a> 上に画像をアップロードされると、プログラムレベルではサーバーのローカルディスクに保存しているように見えますがネットワークドライバー越しにFile Serverに保存されます。そのファイルを3つのWeb Serversから参照できるので<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%B9%A5%BF%A5%F3%A5%B9">インスタンス</a>数を増やしても減らしても大丈夫というわけです。</p>
+
+<p>というわけで、もし<a class="keyword" href="http://d.hatena.ne.jp/keyword/WordPress">WordPress</a>のサイトを<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>にのせたい場合はいつもは<a class="keyword" href="http://d.hatena.ne.jp/keyword/AWS">AWS</a>を使っている方もぜひAzure WebAppを候補にしてみてください。</p>
+
+<h1>参考URL</h1>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fazure.microsoft.com%2Fja-jp%2Fservices%2Fapp-service%2F" title="Azure App Service - アプリのホスティング | Microsoft Azure" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://azure.microsoft.com/ja-jp/services/app-service/">azure.microsoft.com</a></cite></p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fdocs.microsoft.com%2Fja-jp%2Fazure%2Fapp-service%2Fcontainers%2F" title="Azure Web Apps for Containers のドキュメント - チュートリアル、API リファレンス" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://docs.microsoft.com/ja-jp/azure/app-service/containers/">docs.microsoft.com</a></cite></p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fmsdn.microsoft.com%2Fen-us%2Fmagazine%2Fmt793270.aspx%3Ff%3D255%26MSPPError%3D-2147217396" title="Azure - Inside the Azure App Service Architecture" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://msdn.microsoft.com/en-us/magazine/mt793270.aspx?f=255&MSPPError=-2147217396">msdn.microsoft.com</a></cite></p>
+
+</div></section></main></body></html>

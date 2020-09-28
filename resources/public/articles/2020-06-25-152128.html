@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Yuji's Docs</title><link href="/assets/css/main.css" rel="stylesheet"></head><body><header><div class="headerWrapper"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">フロントエンド開発における課題を問い直す〜2020年6月版〜</h1><div class="content">
+<p>2020年6月21日(日)「チャリティカンファレンス沖縄2020 Vol.1 Frontend編」というイベントで、「フロントエンド開発における課題を問い直す」というタイトルで登壇させていただきました。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fre-build.connpass.com%2Fevent%2F179268%2F" title="チャリティカンファレンス沖縄2020 Vol.1 Frontend編(オンライン) (2020/06/21 11:00〜)" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://re-build.connpass.com/event/179268/">re-build.connpass.com</a></cite></p>
+
+<p><figure class="figure-image figure-image-fotolife" title="フロントエンド開発における課題を問い直す"><span itemscope itemtype="http://schema.org/Photograph"><img src="https://cdn-ak.f.st-hatena.com/images/fotolife/a/arakaji-yuu/20200625/20200625152514.png" alt="f:id:arakaji-yuu:20200625152514p:plain" title="f:id:arakaji-yuu:20200625152514p:plain" class="hatena-fotolife" itemprop="image"></span><figcaption>フロントエンド開発における課題を問い直す</figcaption></figure></p>
+
+<p>今回発表資料の準備をするにあたって、まず話したいことをテキストでひたすら書いていき、全て書ききったらそれをもとに<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D1%A5%EF%A5%DD">パワポ</a>のスライドに情報を圧縮するというアプローチで作っていたのですが、せっかく書いたテキストをそのまま捨てるのはもったいないので多少加筆修正した上でこちらのブログにて公開することにしました。</p>
+
+<p>このイベントに参加出来なかった人にも登壇内容が届いて、なにかの参考になれば幸いです。</p>
+
+<hr />
+
+<h1>フロントエンド開発における課題を問い直す〜2020年6月版〜</h1>
+
+<p><iframe id="talk_frame_646560" src="//speakerdeck.com/player/7a7ffa3a9567417ba2e44f2d7ae02afa" width="710" height="399" style="border:0; padding:0; margin:0; background:transparent;" frameborder="0" allowtransparency="true" allowfullscreen="allowfullscreen" mozallowfullscreen="true" webkitallowfullscreen="true"></iframe> <cite class="hatena-citation"><a href="https://speakerdeck.com/ug/issues-about-frontend-development">speakerdeck.com</a></cite></p>
+
+<h1>なぜこのテーマを選んだか？</h1>
+
+<p>登壇すること自体は1ヶ月以上前から決まっていたのですが、登壇テーマがなかなか決まらずグズグズしていると当日のスケジュールが発表されました。
+それを見てみると自分がトップバッターの一人になっていて、かつKey noteという立て付けになっているので、これはやばいぞと思いました笑</p>
+
+<p>せっかくKey noteという立場をいただけたので、僕の方では特定の技術トピックについてお話するのではなく、現在のフロントエンド開発の全体像が見えるようなお話をして、それから他のセッションを聞いて深堀りをできるような形にしていきたいと思います。</p>
+
+<p>では全体像をどういう視点で見ていくかという話なんですが、現在のフロントエンド開発は様々な技術が出てきており、それらはすべて開発における課題を解決するために生まれています。</p>
+
+<p>僕もエンジニアとして技術を学ぶときに「この技術がおもしろそう！！→この技術はこの課題を解決するために生まれたのか〜」というテク<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%CE%A5%ED">ノロ</a><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B8%A1%BC">ジー</a>ファーストなきっかけで学ぶ事が多いのですが、本質的にはまず課題があり、その課題に対して技術でどう解決するかという、イシューファーストなアプローチを取るべきです。</p>
+
+<p>そのため本セッションでは、まずフロントエンド開発における課題を改めて問い直して整理し、その課題に対していまどういう技術が解として存在するのかという話をしていきたいと思います。</p>
+
+<h1>課題の定義</h1>
+
+<p>ではフロントエンド開発における課題はこれです！という話をする前に、まず課題というのがどこから生まれるのかという話をさらっとしておきたいです。</p>
+
+<p>国語辞典で「課題」と調べると以下のようにでます。</p>
+
+<pre><code>１ 与える、または、与えられる題目や主題。
+２ 解決しなければならない問題。果たすべき仕事。
+</code></pre>
+
+<p>「解決しなければならない問題」というのはわかりやすい定義ですね。じゃあフロントエンド開発における解決しなければならない問題っていうのはなぜ解決しないといけないのか？</p>
+
+<p>これを僕は、
+「進みたい方向に進みたい速度で進みたいが、それが出来ない障害があるので、解決しないといけない」と考えています。</p>
+
+<p>そう考えるとまず課題を知るにはそもそもの進みたい方向というのを知る必要があることがわかります。</p>
+
+<h1>フロントエンド開発の目的はユーザーにより良いUXを届けること</h1>
+
+<p>進みたい方向というのは、フロントエンド開発における目的になります。
+フロントエンドというのは、システムとユーザーが接する部分のUIであり、その目的は良いUXを提供することになります。
+じゃあ良いUXってなにか？という話になるんですが、UXの品質評価方法のひとつとして、UX<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%CF%A5%CB%A5%AB%A5%E0">ハニカム</a>という手法があります。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fblog.btrax.com%2Fjp%2Fux-evaluation%2F" title="UXハニカム - UXデザインの正しい品質評価方法 -" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://blog.btrax.com/jp/ux-evaluation/">blog.btrax.com</a></cite></p>
+
+<p><img src="https://paper-attachments.dropbox.com/s_873BB0FCD01D0D5093C40773CB16C9E1C557C683E45C0452DC14CBC868624231_1592609245332_UX.png" alt="" /></p>
+
+<p>これはプロダクトやサービスが提供するUXの評価軸を、useful、desirable、accessible、credible、findable、usableの6つの項目に分け、それぞれの項目を5段階評価をし、その総合点でUXを評価するという手法です。</p>
+
+<p>各項目は以下の様に定義されています。</p>
+
+<p><strong>1. Useful – 役に立つ</strong>
+提供されるプロダクトやサービスがユーザーの役に立っているか。彼らのニーズを満たしているか。もしそれがユーザーの目的を達成していなければ、ユーザー体験としてはレベルが低い。</p>
+
+<p><strong>2. Desirable – 好ましい</strong>
+プロダクトの見た目や雰囲気がユーザーにとって好ましいかどうか。ここに評価軸においては”デザイン要素”はなるべく少ない方が優れているとされる。</p>
+
+<p><strong>3. Accessible – アクセスしやすい</strong>
+体の不自由な方や、異なる制限のあるユーザーにとっても使いやすい体験がデザインされているかどうか。<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BF%A7%CC%D5">色盲</a>の方でも認識しやすいサインなどもその例の一つ。</p>
+
+<p><strong>4. Credible – 信頼できる</strong>
+企業やプロダクトが信頼できるものであるかどうか。例えば無名な企業よりも、著名なブランドの製品であれば、最初からユーザーの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BF%B4%CD%FD%C5%AA">心理的</a>ハードルが下がり、自ずと利用体験がよくなりがち。</p>
+
+<p><strong>5. Findable – 探しやすい</strong>
+情報やコンテンツが見つけやすい。短期間でユーザーが求める情報にたどり着ければ、利用している際のストレスが下がる。サイトであればページの構造、駅や公共の建物であれば、目的の場所に辿り着きやすいなど。</p>
+
+<p><strong>6. Usable – 使いやすい</strong>
+そして<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%E6%A1%BC%A5%B6%A5%D3%A5%EA%A5%C6%A5%A3">ユーザビリティ</a>の高さ。利用していて必要以上に複雑で使いにくい場合はユーザー体験の価値が下がってしまう。例えば家電製品であれば、説明書を読まなければ使い方がわからない時点で減点対象になるであろう。</p>
+
+<p>つまり、UXを最大化させることがUI/フロントエンド開発における目的であるならば、これら6つを高めようとすると発生する課題がフロントエンド開発における課題となります。</p>
+
+<p>では、やっと本題です。フロントエンド開発をすると発生する課題とはなんでしょうか？</p>
+
+<h1>正解がわからない</h1>
+
+<p>最も大きな課題の一つはUXの6つの指標を高めるためにどうすれば良いという正解が誰にもわからないことです。自分たちがリリースしたプロダクトが本当にユーザーの役に立つのか、使いやすいのか、ユーザーに好んでもらえるのかということは、実際にリリースして反応を見てみるまでわかりません。</p>
+
+<h1>マルチデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>への対応</h1>
+
+<p>ソフトウェアのUIは、10数年前まではPCでの利用のみを対象にしていればよかったのですが、現代ではPCだけでなく、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%DE%A1%BC%A5%C8%A5%D5%A5%A9%A5%F3">スマートフォン</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%BF%A5%D6%A5%EC%A5%C3%A5%C8">タブレット</a>の利用まで対象にしないといけません。そしてそれぞれのデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>のOSの違いや、スペックの違い、利用シーンでのネットワーク環境の違いなど様々な状況を考慮に入れた開発をしていく必要があります。</p>
+
+<h1>ユーザーの期待値の増加</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%DE%A1%BC%A5%C8%A5%D5%A5%A9%A5%F3">スマートフォン</a>の普及によって、一般の人もアプリという形でソフトウェアを日常で使うことが普通なことになってきました。そしてみんなが使っているものといえば、<a class="keyword" href="http://d.hatena.ne.jp/keyword/instagram">instagram</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Tiktok">Tiktok</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Netflix">Netflix</a>など世界No1を取ったものばかりです。その世界トッ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%EC%A5%D9">プレベ</a>ルに洗練されたプロダクトを日常で使い目が肥えたユーザーに、それよりも劣るUXを提供してしまってはなかなか使ってもらう、使い続けてもらうに至るのは難しいでしょう。
+つまりUXにおいては、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%BB%F1%CB%DC%CE%CF">資本力</a>においてはるかに劣っていながらも、必然的に世界トッ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%EC%A5%D9">プレベ</a>ルのサービスの基準と戦うことが宿命付けられています。
+また<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%DE%A5%DB">スマホ</a>アプリと接する時間が増えることで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%DE%A5%DB">スマホ</a>でWebアプリを使う時に関しても<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%DE%A5%DB">スマホ</a>アプリと同等のUXが求められるようになってきました。</p>
+
+<h1>正解がわからないという課題に立ち向かう手段</h1>
+
+<p>正解がわからないという課題に対して立ち向かうには基本的には「早く小さくリリースして、フィードバックを得て、そのフィードバックをもとにまた早く小さくリリースする」を繰り返すしかありません。これがいま良く言われている<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B8%A5%E3%A5%A4%A5%EB">アジャイル</a>開発で行われていることでもあります。
+では、みんなが<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B8%A5%E3%A5%A4%A5%EB">アジャイル</a>開発をしている時代においてチーム力、開発力として差がでるところは以下の点になります。</p>
+
+<ul>
+<li>単位時間あたりの試行回数を増やせるか？</li>
+<li>データドリブンな意思決定を行う</li>
+</ul>
+
+
+<h2>単位時間あたりの試行回数を増やす</h2>
+
+<ul>
+<li>限られた人数での開発効率を上げる</li>
+<li>コード量が増えても開発効率を落とさないようにする</li>
+<li>人数が増えても開発効率を落とさないようにする</li>
+</ul>
+
+
+<h2>データドリブンな意思決定を行う</h2>
+
+<ul>
+<li>ユーザーの利用動向に関するデータ収集</li>
+<li>データの可視化</li>
+</ul>
+
+
+<p>では、上記を行うためにいまどのような技術がソリューションとして存在するのか？</p>
+
+<h1>Firebaseはフロントエンドエンジニアの必修項目のひとつ</h1>
+
+<p>「単位時間あたりの試行回数を増やす」、「データドリブンな意思決定を行う」のための手段を総合的に、かつ非常に低価格、そして簡単な方法で提供しているサービスは僕の知る限りFirebaseにおいてありません。</p>
+
+<p>Firebaseのすべての機能を必ず使う必要はありませんが、Firebaseで何が出来て何ができないのかを把握して戦略を持って利用することができれば大きな武器になる、というよりもむしろ戦略を持って利用できないために不要なコストを書けて開発しなくてもよいものに開発リソースをかけてしまい競合に遅れを取るということにことになりかねません。</p>
+
+<h2>単位時間あたりの試行回数を増やすことにどう貢献するのか？</h2>
+
+<p>「単位時間あたりの試行回数を増やす」ために、限られた人数での開発効率をあげる、コード量が増えても開発効率を落とさない、人数が増えても開発効率を落とさない、という3つの点が重要です。</p>
+
+<p>この3つの課題を同時に解消するための手段は、「自分たちで作らない部分を増やすこと」です。</p>
+
+<p>Firebase AuthenticationというFirebaseが提供する認証サービスを例に考えてみましょう。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Ffirebase.google.com%2Fproducts%2Fauth%3Fhl%3Dja" title="Firebase Authentication | シンプルな無料のマルチプラットフォーム ログイン" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://firebase.google.com/products/auth?hl=ja">firebase.google.com</a></cite></p>
+
+<p>ユーザー認証の部分を自分たちでス<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%C3%A5%C1">クラッチ</a>で作らずにFirebase Authenticationを使うという戦略を取れば、その開発コストが大幅に減少し、その分他のアプリ固有の価値を生む機能や改善に開発リソースを使うことができ、それによって開発効率が向上します。</p>
+
+<p>認証機能を自分たちで全て書くよりもFirebase Authenticationを使う方がコード量ははるかに小さくなるため、開発効率を落とさないで済むことができます。</p>
+
+<p>人数が増えると仕様のキャッチアップをするためのコミュケーションコスト増加によって開発効率が落ちていくのですが、自前で作らずFirebase Authenticationを使う選択をしたことで仕様のキャッチアップはFirebase自体のドキュメントを読むだけで完了します。</p>
+
+<p>もちろん外部サービスを利用する場合はそのサービスで出来ないことは出来ないこと、そしてそのサービスの提供が終了してしまうリスクなども考慮した上で利用を検討するべきですが、自前で作らずに既存のサービスを利用することで作らないモノを増やすことは開発効率を上げるための強力な手段になります。</p>
+
+<p>Firebase Authenticationは認証というアプリ必要な単機能を提供してくれるものですが、もっと大胆に「作らない部分を増やす」ことに貢献するFirebaseのサービスがCloud Firestoreです。</p>
+
+<p>Cloud Firestoreは<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>上で<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DB%A5%B9%A5%C6%A5%A3%A5%F3%A5%B0">ホスティング</a>されたNoSQLデータベースですが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>アプリ、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Android">Android</a>アプリ、Webのフロントエンドなどのクライアントから<a class="keyword" href="http://d.hatena.ne.jp/keyword/SDK">SDK</a>経由で直接アクセスできるという特徴があります。</p>
+
+<p>さらにリアルタイムアップデートという機能によって各デ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>から更新されたデータがリアルタイムで各デ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>に共有される機能、オフラインサポート、スケーラビリティの高さという特徴もかねそ兼ね備えています。</p>
+
+<p>コレをうまく活用すれば、いままで単純なデータの読み書きだけのために行っていたサーバーサイドの<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>開発やデータ同期のためのプログラム、そしてスケーラビリティ確保のためのインフラ運用などの大部分を省く事が可能になります。</p>
+
+<p>こちらも利用することによる<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%EC%A1%BC%A5%C9%A5%AA%A5%D5">トレードオフ</a>を見越した上で戦略を立てるべきですので、開発効率を上げるための自分の手札として何が出来て何ができないのかをしっかりとキャッチアップしておくべきでしょう。</p>
+
+<h2>データドリブンな意思決定を行うことにいかに貢献するのか？</h2>
+
+<p>開発効率をどれだけ高める事ができても、提供した機能がユーザーの体験価値をちゃんと高めたのか、またいま提供しているプロダクトのどこがユーザーの体験価値を毀損しているのかを把握することが出来なければ、正しい方向にプロダクトを改善していくことができません。</p>
+
+<p>正しい方向にプロダクトを改善していくには、「ユーザーの利用動向をデータとして取得する」「取得したデータを可視化する」という2つが非常に重要です。</p>
+
+<p>この点においてもFirebaseは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Google%20Analytics">Google Analytics</a>という強力なツールを提供しています。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Ffirebase.google.com%2Fproducts%2Fanalytics%3Fhl%3Dja" title="Firebase 向け Google アナリティクス | 無料かつ無制限のアプリ アナリティクス" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://firebase.google.com/products/analytics?hl=ja">firebase.google.com</a></cite></p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/Google%20Analytics">Google Analytics</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/SDK">SDK</a>を入れるだけで、自分たちのアプリをどれくらいのユーザーが利用しているのか、どこで利用しているのか、どれくらいの時間利用しているのかなどがわかります。</p>
+
+<p>より詳細なことが知りたい、たとえばどの画面を開いたのか、どのボタンを押したかなどを知りたければイベントを発火するコードを書くだけで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%E9%A5%A6%A5%C9">クラウド</a>上に記録されていきます。</p>
+
+<p>そしてそれらのデータが<a class="keyword" href="http://d.hatena.ne.jp/keyword/Google">Google</a> Anaticsの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C0%A5%C3%A5%B7%A5%E5">ダッシュ</a>ボード上で可視化されるので、その<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C0%A5%C3%A5%B7%A5%E5">ダッシュ</a>ボード上で自分たちのアプリが正しく改善されているのかを客観的な事実であるデータで知る事ができます。</p>
+
+<p>同じ事ができるツールは他にもありますがそれらは有償であることや、Firebaseの場合他にもパフォーマンス監視やクラッシュレポートに関する機能なども提供されかつ無料であることを考えても、デフォルトで取る選択肢としてFirebaseの<a class="keyword" href="http://d.hatena.ne.jp/keyword/Google%20Analytics">Google Analytics</a>を利用することが多いでしょう。</p>
+
+<p>「単位時間あたりの試行回数を増やす」、「データドリブンな意思決定をする」をするための強力な技術の一つとしてFirebaseがあるのは間違いないため、これからフロントエンド開発に関わる上でほぼ必須科目に近いぐらい身に付けないといけないモノだと考えています。</p>
+
+<h1>マルチデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>への対応という課題に立ち向かう手段</h1>
+
+<p>マルチデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>への対応というのはまず2つに分類することができます。</p>
+
+<ul>
+<li>Webのフロントエンドをマルチデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>対応をどうするのか</li>
+<li>各デ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>のネイティブアプリを提供をどうするのか</li>
+</ul>
+
+
+<p>今回は「Webのフロントエンドをマルチデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>対応すること」は、僕の理解だとどこもそこまで大きな<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A4%A5%F3%A5%D1%A5%AF">インパク</a>トのある差異はなくて「レスポンシブ対応していこうな」というところだと思っています。</p>
+
+<p>各デ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>のネイティブアプリを提供するかどうかという点は、今回はわかりやすくするため以下の3つのプラットフォーム上に、それぞれ用のフロントエンド(モバイルの場合はネイティブアプリ)の提供をどのようにするのか？という風に考えます。</p>
+
+<ul>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/Android">Android</a>端末</li>
+<li><a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>端末</li>
+<li>Web</li>
+</ul>
+
+
+<p>これは「それぞれのプラットフォーム上のアプリ同士でどのくらいコードを共有するのか？」を考えることです。</p>
+
+<p>単純に考えると、すべてのデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>にそれぞれのプラットフォーム用の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%ED%A5%B0%A5%E9%A5%DF%A5%F3%A5%B0%B8%C0%B8%EC">プログラミング言語</a>(<a class="keyword" href="http://d.hatena.ne.jp/keyword/Android">Android</a>を<a class="keyword" href="http://d.hatena.ne.jp/keyword/Java">Java</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>をSwift、WebをJS)でフロントエンドを書くことにした場合、すべてのプラットフォーム用に共通コードを使うよりも開発リソースが必要になります。</p>
+
+<p>しかし、コードをすべて共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>した場合には各プラットフォーム固有の処理を書かなければならない場合にはコードを分離して書かなければならないためコードの複雑性は高くなる傾向があります。またプラットフォーム間のコード共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>を支援している<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>が、各プラットフォームのアップデートにどれだけついていけるのか？という課題もあります。</p>
+
+<p>これらの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%EC%A1%BC%A5%C9%A5%AA%A5%D5">トレードオフ</a>を見極めた上で技術選択をしていく必要がありますが、ではこの課題に向き合うための技術はなにがあるでしょうか？</p>
+
+<h1>Flutter、<a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>と<a class="keyword" href="http://d.hatena.ne.jp/keyword/Android">Android</a>のコード共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>の解のひとつ</h1>
+
+<p>Flutterは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Google">Google</a>が提供している<a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>と<a class="keyword" href="http://d.hatena.ne.jp/keyword/Android">Android</a>アプリを<a class="keyword" href="http://d.hatena.ne.jp/keyword/Dart">Dart</a>という言語で、共通のプログラムで書く事ができる技術の一つです。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fflutter.dev%2F" title="Flutter - Beautiful native apps in record time" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://flutter.dev/">flutter.dev</a></cite></p>
+
+<p>ただし共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>できるのはあくまでUIと<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D3%A5%B8%A5%CD%A5%B9%A5%ED%A5%B8%A5%C3%A5%AF">ビジネスロジック</a>などプラットフォームに依存しないコードの部分であり、カメラなどの機能はプラットフォーム固有のコードを<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%B0%A5%A4%A5%F3">プラグイン</a>という形で書く必要があります。ただ良く使う機能のほとんどは<a class="keyword" href="http://d.hatena.ne.jp/keyword/OSS">OSS</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%E9%A5%B0%A5%A4%A5%F3">プラグイン</a>が提供されているので凝ったことをしないのであればそれをインストールして使うことで解決するでしょう。</p>
+
+<p>今回のカンファレンスでは登壇者がいませんが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>と<a class="keyword" href="http://d.hatena.ne.jp/keyword/Android">Android</a>でコードを共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>するというアプローチを取っている技術はFlutter以外にもあります。</p>
+
+<p>・Xamarin
+・React Native
+・ionic(cordova)</p>
+
+<h2>Xamarin</h2>
+
+<p>Xamarinは<a class="keyword" href="http://d.hatena.ne.jp/keyword/Microsoft">Microsoft</a>が提供する<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>で、<a class="keyword" href="http://d.hatena.ne.jp/keyword/C%23">C#</a>という言語を使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>と<a class="keyword" href="http://d.hatena.ne.jp/keyword/Android">Android</a>アプリを開発することができます。先日公開されたCOVID-19の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C0%DC%BF%A8">接触</a>確認アプリも、実はXamarinで作られています。もしインストールしていない方がいればぜひインストールしてみてください。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fdocs.microsoft.com%2Fja-jp%2Fxamarin%2Fget-started%2Fwhat-is-xamarin" title="Xamarin とは - Xamarin" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://docs.microsoft.com/ja-jp/xamarin/get-started/what-is-xamarin">docs.microsoft.com</a></cite></p>
+
+<p>XamarinとFlutterの違いとして特徴的なのが、Flutterは「UIとロジックの共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>が目的」なのに対して、Xamarinは「ロジックの共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>が目的、だけどUIも共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>をしたければできる」という違いです。</p>
+
+<p>Xamarinは、Anroidや<a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>の各プラットフォーム固有の<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>と<a class="keyword" href="http://d.hatena.ne.jp/keyword/C%23">C#</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/API">API</a>で1対1の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%C3%A5%D4%A5%F3%A5%B0">マッピング</a>を行っているので、<a class="keyword" href="http://d.hatena.ne.jp/keyword/C%23">C#</a>から直接プラットフォーム固有の機能を使うことができます。
+Xamarin.Formというライブラリを使うと<a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>と<a class="keyword" href="http://d.hatena.ne.jp/keyword/Android">Android</a>で共通コードを使ってUIを作ることもできますが、全く別々のコードを使いつつロジックだけ共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>するというアプローチも取れます。</p>
+
+<h2>React Native</h2>
+
+<p>こちらはReact.jsというWeb用のViewライブラリを<a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>と<a class="keyword" href="http://d.hatena.ne.jp/keyword/Android">Android</a>でも同じ思想で使えるようにしたものです。こちらはJSを使って<a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>と<a class="keyword" href="http://d.hatena.ne.jp/keyword/Android">Android</a>のUIとロジックを共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>して作ることができます。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Freactnative.dev%2F" title="React Native · A framework for building native apps using React" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://reactnative.dev/">reactnative.dev</a></cite></p>
+
+<p>JSでUIを書くにも関わらず実際に実行されているのはネイティブのUI<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%DD%A1%BC%A5%CD%A5%F3%A5%C8">コンポーネント</a>なので、ネイティブアプリ水準のパフォーマンスが期待できます。</p>
+
+<p>FlutterやXamarinとの違いは、すでにウェブのフロントエンドを作るのと同じReact.jsと<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>をネイティブアプリの開発利用できるようにすることで、Webのフロントエンド開発者を、学習コストを減らした形でモバイルのネイティブアプリの開発者として転用可能にしている点です。</p>
+
+<h2>ionic(cordova)</h2>
+
+<p>ionicはFlutter、Xamarin、React Nativeと違い、JS/HTML/<a class="keyword" href="http://d.hatena.ne.jp/keyword/CSS">CSS</a>というWebのフロントエンド技術を使ってアプリを作り、それをモバイルアプリのWebView上で動かすというアプローチを取っています。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fionicframework.com%2F" title="Ionic - Cross-Platform Mobile App Development" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://ionicframework.com/">ionicframework.com</a></cite></p>
+
+<p>これは<a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Android">Android</a>でコードを共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>するのはもちろんのこと、Webフロントエンドともコードを共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>することが技術的には可能になります。(Webと共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>する場合ネイティブの機能を提供するPluginをどううまく扱うか、またWebとモバイルアプリで製品のライフサイクルが違うなどの課題はある)</p>
+
+<p>その<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%EC%A1%BC%A5%C9%A5%AA%A5%D5">トレードオフ</a>として、パフォーマンスやUXの面でネイティブアプリ同等のものを提供する難易度が高い、プラットフォーム固有の機能を使う場合はpluginという形で別でコードを書かなければならないなどの課題も出てきます。</p>
+
+<p>このように<a class="keyword" href="http://d.hatena.ne.jp/keyword/Android">Android</a>と<a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>のコードを共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>してマルチデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>対応を開発効率を上げながら行うための技術はいくつかあります。
+各ツールのメリットデメリットを理解しつつ、共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>するのか別々に作るのか、また共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>するならどの部分を共<a class="keyword" href="http://d.hatena.ne.jp/keyword/%C4%CC%B2%BD">通化</a>するためにどのツールを使うのかを考えて選択していく必要があります。</p>
+
+<h2>ネイティブアプリを使わずにWebアプリをモバイルアプリのように提供する方法としてのPWA</h2>
+
+<p>FlutterやXamarinなどはあくまで<a class="keyword" href="http://d.hatena.ne.jp/keyword/Android">Android</a>と<a class="keyword" href="http://d.hatena.ne.jp/keyword/iOS">iOS</a>でコードを共有してモバイルアプリを開発・提供するための技術ですが、あくまでウェブアプリとは別のコードを書く必要があります。</p>
+
+<p>そこに対して「ウェブアプリ自体をモバイルアプリのように動かせるようにしたらいいじゃないか」というアプローチを取っているのがPWA(<a class="keyword" href="http://d.hatena.ne.jp/keyword/Progressive">Progressive</a> Web App)の技術になります。</p>
+
+<p><iframe src="https://hatenablog-parts.com/embed?url=https%3A%2F%2Fdeveloper.mozilla.org%2Fja%2Fdocs%2FWeb%2FProgressive_web_apps" title="プログレッシブウェブアプリ" class="embed-card embed-webcard" scrolling="no" frameborder="0" style="display: block; width: 100%; height: 155px; max-width: 500px; margin: 10px 0px;"></iframe><cite class="hatena-citation"><a href="https://developer.mozilla.org/ja/docs/Web/Progressive_web_apps">developer.mozilla.org</a></cite></p>
+
+<p>PWAとはReactやFlutterのような特定の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>、ライブラリのことではなく、ブラウザに搭載されている機能の組み合わせによってモバイルアプリと同等の機能を実現するための<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C7%A5%B6%A5%A4%A5%F3%A5%D1%A5%BF%A1%BC%A5%F3">デザインパターン</a>のようなものです。</p>
+
+<p>ここでいう「モバイルアプリ同等の機能」とは、以下になります。</p>
+
+<ul>
+<li>インストール可能(ホーム画面にアイコン設置、そのアイコンをタップして起動できる)</li>
+<li>ネットワーク非依存(ネットがなくてもローカルにデータ保存して動かすことができる)</li>
+<li>再エンゲージ可能(プッシュ通知など)</li>
+</ul>
+
+
+<p>モバイルデ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D0%A5%A4%A5%B9">バイス</a>に大きく依存した機能(カメラや<a class="keyword" href="http://d.hatena.ne.jp/keyword/GPS">GPS</a>、ARなど)が必要なアプリについてはPWAのアプローチは取れないですが、Webで提供している機能をモバイルでも提供したいだけの場合、PWAのアプローチを取ることでモバイルアプリの開発リソースを全く使わずに上記３つの要件を実現することが可能になります。</p>
+
+<h1>ユーザーの期待値の増加に立ち向かう手段として生まれたSPA</h1>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%DE%A5%DB">スマホ</a>ネイティブアプリと同等のUXをWebのフロントエンドでも実現するために考え出されたのがSPA(Single Page Application)です。</p>
+
+<p>皆さんご存知だと思いますが、SPAは1ページのHTMLをJSで動的に書きながら画面描画をする技術のことです。</p>
+
+<p>いままでは画面遷移やユーザーのアクションのたびに画面を全部リロードしないといけなかったものを、必要なデータだけをサーバーと通信し画面描画はリロードせずに行えるようにすることで<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B9%A5%DE%A5%DB">スマホ</a>アプリのようなUXを実現可能にしました。</p>
+
+<p>SPAによってネイティブアプリとUXで戦える土台を手に入れましたが、それによってまた新たな多くの課題を生み出しました。それが以下になります。</p>
+
+<ul>
+<li>JSでより多くを担当することによるプログラムの複雑性が増加</li>
+<li>初回表示パフォーマンス悪化と<a class="keyword" href="http://d.hatena.ne.jp/keyword/Google">Google</a>インデックスが遅い問題</li>
+</ul>
+
+
+<h1>プログラムの複雑性の増加</h1>
+
+<h2>画面描画処理の複雑性とパフォーマンス改善</h2>
+
+<p>SPA以前は入力フォームのバリデーションや少しの<a class="keyword" href="http://d.hatena.ne.jp/keyword/AJax">AJax</a>やHTMLの動的変更程度だった<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>の役割が、SPAによって非常に多くのことを担当せざる得なくなり、それによってコード量の増加、複雑性の増加が激しくなりました。</p>
+
+<p>そのうち最も大きな比重を占めるのが、アプリケーションの現在の状態をもとに画面を正しく描画する、DOMを変更するというプログラムを書くことです。</p>
+
+<p>この処理を、メンテナンスしやすく、簡単に、かつパフォーマンス高く解決しようと生まれたのがReact.jsであり、Vue.jsであり、Angular(js)になります。</p>
+
+<h2>不具合発生率を言語レベルで減らすための策としてのTypeScript</h2>
+
+<p>SPAにすることで画面描画処理の他にも非常に多くのロジックがプログラムに入ってきてコード量がふえてきます。コード量が増えてくると適切に設計されていなければ依存がどんどん増えていき、一つの変更によって想定外の場所に影響が及びバグが発生してしまう可能性も高くなります。</p>
+
+<p>バグをリリース前に見つけるにはテストが必要ですが、手動テストでは時間が非常にかかってしまう上に漏れの可能性もあります。そのため本来的には自動テストを書くべきではあるのですが、UIに関するテストはテストプログラムを書く難易度が高い上にUIの変更頻度も多いため書いたプログラムが無駄になることも多々あります。</p>
+
+<p>この<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%C8%A5%EC%A1%BC%A5%C9%A5%AA%A5%D5">トレードオフ</a>に関するリーズナブルな解としてTypeScriptが利用されるケースが増えています。</p>
+
+<p>TypeScriptは<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>にトランスパイルすることができる言語ですが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>に型という言語仕様をつけているのが一番の特徴です。</p>
+
+<p>関数や変数で受け取れる値の型を明示することで、間違った型の値が入った場合には<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB">コンパイル</a>時にエラーを検出してくれます。</p>
+
+<p>これにより、値の形式(型）違いによるバグの発生を事前に防ぐ事ができる上に、不要になったコードの削除や簡単なプログラムの変更などを<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%B3%A5%F3%A5%D1%A5%A4%A5%EB">コンパイル</a>が通ればある程度は動くという安心感を得られるようになりました。</p>
+
+<p>もちろんテストを置き換えるものではありませんが、コードや開発に関わる人が増えていったときにも開発効率を下げないための手段としてTypeScriptは<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>をそのまま使うよりは支持されているように思えます。</p>
+
+<h2>初回表示パフォーマンス悪化と<a class="keyword" href="http://d.hatena.ne.jp/keyword/Google">Google</a>インデックスが遅い問題</h2>
+
+<p>SPAによって、Webアプリを利用中のUX/パフォーマンスは以前と比べて大きく改善可能になりましたが、逆に初回表示時のサーバーからレスポンスを受け取ってから画面が描画されアプリを利用できるようになるまでのパフォーマンスの悪化が問題視されるようになりました。</p>
+
+<p>SPA以前の場合はサーバー側でHTMLを描画しているため、そのレスポンスをブラウザが受け取って描画するまでの時間は微微たるものでした。</p>
+
+<p>しかしSPAになるとサーバーからのレスポンスは早くても、そのレスポンスをブラウザが受け取って画面を描画するためにはまず<a class="keyword" href="http://d.hatena.ne.jp/keyword/JavaScript">JavaScript</a>をすべて読みこんで解釈し、それを実行し、それから<a class="keyword" href="http://d.hatena.ne.jp/keyword/Ajax">Ajax</a>で画面描画のためのデータを取得とし、最終的に画面が描画されるため初回表示時の待ち時間が明らかに悪化していました。</p>
+
+<p>また、Newsなどのメディ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%A2%A5%B5%A5%A4">アサイ</a>トの場合<a class="keyword" href="http://d.hatena.ne.jp/keyword/Google">Google</a>検索からの<a class="keyword" href="http://d.hatena.ne.jp/keyword/%CE%AE%C6%FE">流入</a>が非常に多いため、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Google">Google</a>に正しくそして早くインデックスされることがビジネス上非常に重要なファクターになるのですが、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Google">Google</a>の<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%AF%A5%ED%A1%BC%A5%E9%A1%BC">クローラー</a>はJSの解釈は行うためSPAで作ったサイトでもインデックス自体はされるものの、JSの解釈をしてインデックスをされるまでの時間が通常のサイトよりも遅くなる傾向があるため、この問題も解決する必要がありました。</p>
+
+<p>初回表示パフォーマンス悪化と<a class="keyword" href="http://d.hatena.ne.jp/keyword/Google">Google</a>インデックス遅い問題を両方解決するためのアプローチとして生まれたのが<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSR">SSR</a>(サーバーサイド<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%EC%A5%F3%A5%C0%A5%EA%A5%F3%A5%B0">レンダリング</a>)という技術です。</p>
+
+<p><a class="keyword" href="http://d.hatena.ne.jp/keyword/SSR">SSR</a>とは、SPAの場合はクライアントサイドで描画していたHTMLを、初回表示の場合のみサーバー側で描画しつつ、クライアントでJSが実行された際には現在の状態をHTMLから読み取れるようにデータを埋め込んでおく手法です。</p>
+
+<p>これにより初回表示の場合はJSの実行またずに画面描画されつつ次のユーザーのアクションからはSPAとしてJSで画面描画を行うことを可能にしました。
+初回表示をサーバーサイドでHTML描画できるようにしたことで、<a class="keyword" href="http://d.hatena.ne.jp/keyword/Google">Google</a>クローラもJSの実行なしにコンテンツを読み取れ、早くインデックスされることを可能にしました。</p>
+
+<p>しかしこの<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSR">SSR</a>、フロントエンド用に書いてあるJSをサーバーサイドのnodejsで実行できるようにしつつ状態の受け渡しをスムーズに行う必要があるため、0からコレを作るのは非常に手間のかかるものでした。</p>
+
+<p>それをSPAでよく使われるViewライブラリ毎に<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D5%A5%EC%A1%BC%A5%E0%A5%EF%A1%BC%A5%AF">フレームワーク</a>として解決したのが、Vue.jsのNuxt.jsであり、React.jsのNext.jsです。ちなみにAngularの方もAngular UniveralというAngularに同梱されているライブラリで<a class="keyword" href="http://d.hatena.ne.jp/keyword/SSR">SSR</a>の導入をできるようにしています。</p>
+
+<h1>さいごに</h1>
+
+<p>この7〜8年のフロントエンドに関わる技術の発展は凄まじく、いろんな技術が生まれては消えていきます。しかし、それらの技術はいずれも特定の課題に対する解決策として生まれています。</p>
+
+<p>ただいま流行っている技術を追うだけでなく、そもそもいまフロントエンド開発に起こっているトッ<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%D7%A5%EC%A5%D9">プレベ</a>ルの課題からブレイクダウンして課題を具体化し、それらの解決策としていま注目されている技術はどのように<a class="keyword" href="http://d.hatena.ne.jp/keyword/%A5%DE%A5%C3%A5%D4%A5%F3%A5%B0">マッピング</a>されているのかを見ていくと、自分たちのプロダクトや組織にとって必要な技術がなんなのかが見えてくると思います。</p>
+
+<p>この発表で、いまのフロントエンド開発のなんとなく全体像が見えてくる、かつ、課題から考えるということの重要性を理解することが出来たら良いなと思っています。</p>
+
+<p>長々とお付き合いいただきありがとうございました。</p>
+
+</div></section></main></body></html>
