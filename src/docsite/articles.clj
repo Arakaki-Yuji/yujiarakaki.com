@@ -18,12 +18,9 @@
 (defn read-articles-from-disc []
   (map make-article (.listFiles (java.io.File. docs-path))))
 
-
 (defn web-url [article]
   (str articles-directory "/" (:name article) ".html"))
 
 (defn read-markdown [article]
   (-> (slurp (:path article))
       (md-to-html-string-with-meta)))
-
-(read-markdown {:path "resources/docs/hello-world.md"})
