@@ -8,30 +8,30 @@
             [docsite.import :refer [hatenablog-import]])
   (:gen-class))
 
-(defn compile-article-page [doc-path page-name]
-  (let [md-with-meta  (md-to-html-string-with-meta (slurp doc-path))
-        html (:html md-with-meta)
-        title (first (:title (:metadata md-with-meta)))]
-    (spit (str public-articles-path "/" page-name ".html")
+(defn compile-article-page [article]
+  (let [html (:html article)
+        title (:title article)
+        name (:name article)]
+    (spit (str public-articles-path "/" name ".html")
           (article-page/page html title))))
 
 (defn compile-all-article-page []
-  (for [doc (read-articles-from-disc)]
+  (for [article (read-articles-from-disc)]
     (do
-      (compile-article-page (:path doc) (:name doc))
+      (compile-article-page article)
       )))
 
-(defn compile-index-page []
+(defn compile-index-page [articles]
   (spit (str public-path "/index.html")
-        (index-page/page (read-articles-from-disc))))
+        (index-page/page articles)))
 
 (defn static-compile []
-  (do
-    (hatenablog-import "resources/arakaji.hatenablog.com.export.txt")
-    (compile-index-page)
-    (compile-all-article-page)
-    )
-  )
+  (let [article-collection (sort-by :name
+                                    (into (read-articles-from-disc)
+                                          (hatenablog-import "resources/arakaji.hatenablog.com.export.txt")))]
+    (doall (map compile-article-page article-collection))
+    (do (compile-index-page (reverse article-collection)))
+  ))
 
 (defn -main
   "I don't do a whole lot ... yet."

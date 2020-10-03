@@ -1,7 +1,12 @@
 (ns docsite.import
   (:require [clojure.string :as string]
             [docsite.templates.article :as article-page]
-            [docsite.config :refer [public-articles-path]]))
+            [docsite.config :refer [public-articles-path]]
+            [docsite.articles :refer [make-article]])
+  (:import [java.time LocalDate]
+           [java.time.format DateTimeFormatter]))
+
+(def date-formatter (DateTimeFormatter/ofPattern "MM/dd/yyyy"))
 
 (defn- split-by-page [import-text]
   (string/split import-text
@@ -48,11 +53,16 @@
   (string/replace (get-in page-data [:meta "BASENAME"])
                   #"\/"
                   "-"))
+
+(defn page->article [page]
+  (make-article (page-name page)
+                (get-in page [:meta "TITLE"])
+                (LocalDate/parse (first (string/split (get-in page [:meta "DATE"]) #" "))
+                                 date-formatter)
+                (:body page)))
+
+(.format  (:created-at (page->article (first (parse "resources/arakaji.hatenablog.com.export.txt"))))
+          (DateTimeFormatter/ofPattern "yyyy/MM/dd"))
+
 (defn hatenablog-import [import-file-path]
-  (let [pages (parse import-file-path)]
-    (for [p pages]
-      (spit (str public-articles-path "/" (page-name p) ".html")
-            (article-page/page (:body p) (get-in p [:meta "TITLE"])))
-      )
-    )
-  )
+  (map page->article (parse import-file-path)))
