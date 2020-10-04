@@ -61,8 +61,10 @@
                                  date-formatter)
                 (:body page)))
 
-(.format  (:created-at (page->article (first (parse "resources/arakaji.hatenablog.com.export.txt"))))
-          (DateTimeFormatter/ofPattern "yyyy/MM/dd"))
+(defn publish? [page]
+  (= "Publish" (get-in page [:meta "STATUS"])))
 
 (defn hatenablog-import [import-file-path]
-  (map page->article (parse import-file-path)))
+  (map page->article
+       (filter publish?
+               (parse import-file-path))))
