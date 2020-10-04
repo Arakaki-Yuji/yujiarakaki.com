@@ -53,9 +53,6 @@ main {
 .articleList a {
   text-decoration: none;
 }
-.articleList a:hover {
-  text-decoration: underline;
-}
 
 .articleDetailPage .articleTitle {
   margin: 60px 0px;
