@@ -8,6 +8,10 @@
             [docsite.import :refer [hatenablog-import]])
   (:gen-class))
 
+(defn load-all-articles []
+  (into (read-articles-from-disc)
+        (hatenablog-import "resources/arakaji.hatenablog.com.export.txt")))
+
 (defn compile-article-page [article]
   (let [html (:html article)
         title (:title article)
@@ -26,12 +30,10 @@
         (index-page/page articles)))
 
 (defn static-compile []
-  (let [article-collection (sort-by :name
-                                    (into (read-articles-from-disc)
-                                          (hatenablog-import "resources/arakaji.hatenablog.com.export.txt")))]
+  (let [article-collection (sort-by :name (load-all-articles))]
     (doall (map compile-article-page article-collection))
     (do (compile-index-page (reverse article-collection)))
-  ))
+    ))
 
 (defn -main
   "I don't do a whole lot ... yet."
@@ -41,3 +43,7 @@
     (static-compile)
     (println "----- Done -----")
     ))
+
+
+(count (into (read-articles-from-disc)
+             (hatenablog-import "resources/arakaji.hatenablog.com.export.txt")))

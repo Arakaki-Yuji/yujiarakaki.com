@@ -3,6 +3,8 @@
 (def header
   [:header
    [:div.headerWrapper
-    [:div.brandTitle [:a {:href "/"} "Yuji Arakaki"]]
+    [:img.brandLogo {:src "/assets/images/icon.jpg"}]
+    [:div.brandTitle
+     [:a {:href "/"} "Yuji Arakaki"]]
     ]
    ])

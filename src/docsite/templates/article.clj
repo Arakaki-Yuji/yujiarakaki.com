@@ -5,7 +5,7 @@
 
 (defn page [content title]
   (html5 head
-         [:body
+         [:body.articleDetailPage
           header
           [:main
            [:section.article

@@ -8,7 +8,7 @@
 
 (defn page [articles]
   (html5 head
-         [:body
+         [:body.indexPage
           header
           [:main
            [:div.articleList

@@ -1,10 +1,8 @@
 body {
   margin: 0;
-  font-size: 1rem;
-  font-weight: 400;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   background-color: #fff;
   color: #0c0c0c;
+  line-height: 1.75;
 }
 
 header {
@@ -14,6 +12,12 @@ header {
 header .headerWrapper {
   margin: auto;
   max-width: 660px;
+}
+header .headerWrapper img {
+  height: 30px;
+  width: auto;
+  border-radius: 50%;
+  float: left;
 }
 header .brandTitle {
   font-weight: bold;
@@ -29,7 +33,13 @@ header .brandTitle a{
 main {
   padding: 0 20px;
   max-width: 660px;
-  margin: auto;
+  margin: auto auto 60px auto;
+}
+.indexPage .article {
+  margin: 50px 0;
+}
+.indexPage a {
+  color: #0c0c0c;
 }
 .articleList .article .articleTitle{
   color: #0c0c0c;
@@ -43,3 +53,22 @@ main {
 .articleList a {
   text-decoration: none;
 }
+
+.articleDetailPage .articleTitle {
+  margin: 60px 0px;
+}
+
+.articleDetailPage h1,.articleDetailPage h2,.articleDetailPage h3,.articleDetailPage h4 {
+  margin: 1.75em 0;
+}
+.articleDetailPage pre,code {
+  background: #f5f5f5;
+  border: none;
+  white-space: pre-wrap;
+  padding: 15px;
+  margin: 2rem 0;
+}
+
+.articleDetailPage video,img {
+  width: 100%;
+} 
