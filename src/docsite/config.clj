@@ -1,5 +1,7 @@
 (ns docsite.config)
 
+(def site-title "Yuji Arakaki")
+
 (def docs-path "resources/docs")
 
 (def public-path "resources/public")

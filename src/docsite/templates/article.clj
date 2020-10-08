@@ -1,10 +1,11 @@
 (ns docsite.templates.article
   (:require [hiccup.page :refer [html5]]
+            [docsite.config :refer [site-title]]
             [docsite.templates.partials.head :refer [head]]
             [docsite.templates.partials.header :refer [header]]))
 
 (defn page [content title]
-  (html5 head
+  (html5 (head (str site-title " | " title))
          [:body.articleDetailPage
           header
           [:main

@@ -1,5 +1,6 @@
 (ns docsite.templates.index
   (:require [hiccup.page :refer [html5]]
+            [docsite.config :refer [site-title]]
             [docsite.templates.partials.head :refer [head]]
             [docsite.templates.partials.header :refer [header]]
             [docsite.articles :refer [web-url]]
@@ -7,7 +8,7 @@
 
 
 (defn page [articles]
-  (html5 head
+  (html5 (head site-title)
          [:body.indexPage
           header
           [:main
