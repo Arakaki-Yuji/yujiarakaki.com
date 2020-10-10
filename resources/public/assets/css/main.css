@@ -61,14 +61,18 @@ main {
 .articleDetailPage h1,.articleDetailPage h2,.articleDetailPage h3,.articleDetailPage h4 {
   margin: 1.75em 0;
 }
-.articleDetailPage pre,code {
+.articleDetailPage pre,.articleDetailPage code {
   background: #f5f5f5;
   border: none;
   white-space: pre-wrap;
   padding: 15px;
   margin: 2rem 0;
 }
+.articleDetailPage .content a {
+  color: #0c0c0c;
+  border-bottom: 1px solid #e3e3e3;
+}
 
-.articleDetailPage video,img {
+.articleDetailPage video,.articleDetailPage img {
   width: 100%;
 } 
