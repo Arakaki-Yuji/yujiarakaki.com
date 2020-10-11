@@ -3,6 +3,7 @@
             [docsite.config :refer [site-title]]
             [docsite.templates.partials.head :refer [head]]
             [docsite.templates.partials.header :refer [header]]
+            [docsite.templates.partials.footer :refer [footer]]
             [docsite.articles :refer [web-url]]
             [docsite.templates.utils.article :refer [created-at]]))
 
@@ -23,4 +24,5 @@
               )
             ]
            ]
+          footer
           ]))

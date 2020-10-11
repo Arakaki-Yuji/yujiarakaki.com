@@ -2,7 +2,9 @@
   (:require [hiccup.page :refer [html5]]
             [docsite.config :refer [site-title]]
             [docsite.templates.partials.head :refer [head]]
-            [docsite.templates.partials.header :refer [header]]))
+            [docsite.templates.partials.header :refer [header]]
+            [docsite.templates.partials.footer :refer [footer]]
+            ))
 
 (defn page [content title]
   (html5 (head (str site-title " | " title))
@@ -16,4 +18,5 @@
              ]
             ]
            ]
+          footer
           ]))

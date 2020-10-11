@@ -1,6 +1,7 @@
 (ns docsite.core
   (:require [docsite.templates.index :as index-page]
             [docsite.templates.article :as article-page]
+            [docsite.templates.profile :as profile-page]
             [markdown.core :refer [md-to-html-string-with-meta]]
             [clojure.string :as string]
             [docsite.articles :refer [read-articles-from-disc]]
@@ -29,10 +30,17 @@
   (spit (str public-path "/index.html")
         (index-page/page articles)))
 
+(defn compile-profile-page []
+  (spit (str public-path "/profile.html")
+        (profile-page/page)))
+
 (defn static-compile []
   (let [article-collection (sort-by :name (load-all-articles))]
     (doall (map compile-article-page article-collection))
-    (do (compile-index-page (reverse article-collection)))
+    (do
+      (compile-index-page (reverse article-collection))
+      (compile-profile-page)
+      )
     ))
 
 (defn -main

@@ -76,3 +76,14 @@ main {
 .articleDetailPage video,.articleDetailPage img {
   width: 100%;
 } 
+
+footer {
+  border-top: 1px solid #ccc;
+}
+footer .footerWrapper {
+  max-width: 660px;
+  margin: auto;
+}
+.footerWrapper h1,.footerWrapper h2,.footerWrapper h3,.footerWrapper h4 {
+  margin: 1rem 0;
+}
