@@ -22,7 +22,7 @@
    ;; [:meta {:property "og:description" :content ""}]
    ;; [:meta {:property "og:url" :content ""}]
    [:meta {:property "og:site_name" :content site-title}]
-   [:meta {:property "og:image" :content "/assets/images/icon.jpg"}]
+   [:meta {:property "og:image" :content "https://yujiarakaki.com/assets/images/icon.jpg"}]
 
    ;; twitter card
    [:meta {:name "twitter:card" :content "summary"}]
