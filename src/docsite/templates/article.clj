@@ -7,7 +7,7 @@
             ))
 
 (defn page [content title]
-  (html5 (head (str site-title " | " title))
+  (html5 (head (str title " | " site-title))
          [:body.articleDetailPage
           header
           [:main
