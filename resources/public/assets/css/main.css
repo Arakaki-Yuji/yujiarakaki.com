@@ -73,7 +73,7 @@ main {
   border-bottom: 1px solid #e3e3e3;
 }
 
-.articleDetailPage video,.articleDetailPage img {
+.articleDetailPage video,.articleDetailPage img, .articleDetailPage iframe {
   width: 100%;
 } 
 
