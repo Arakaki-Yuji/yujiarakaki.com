@@ -7,7 +7,7 @@
    [:meta {:name "viewport" :content "width=device-width, initial-scale=1"}]
    [:title title]
    [:link {:rel "stylesheet" :href "/assets/css/main.css"}]
-   
+
    [:link {:ref "apple-touch-icon" :sizes "180x180" :href "/apple-touch-icon.png"}]
    [:link {:ref "icon" :type "image/png" :sizes "32x32" :href "/favicon-32x32.png"}]
    [:link {:ref "icon" :type "image/png" :sizes "16x16" :href "/favicon-16x16.png"}]
@@ -23,4 +23,8 @@
    ;; [:meta {:property "og:url" :content ""}]
    [:meta {:property "og:site_name" :content site-title}]
    [:meta {:property "og:image" :content "/assets/images/icon.png"}]
+
+   ;; twitter card
+   [:meta {:name "twitter:card" :content "summary"}]
+   [:meta {:name "twitter:site" :content "@arakaji"}]
    ])
