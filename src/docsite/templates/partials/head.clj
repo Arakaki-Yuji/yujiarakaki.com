@@ -17,7 +17,7 @@
    [:meta {:name "theme-color" :content "#ffffff"}]
 
    ;; ogp tags
-   [:meta {:perperty "og:title" :content title}]
+   [:meta {:property "og:title" :content title}]
    [:meta {:property "og:type" :content "website"}]
    ;; [:meta {:property "og:description" :content ""}]
    ;; [:meta {:property "og:url" :content ""}]
