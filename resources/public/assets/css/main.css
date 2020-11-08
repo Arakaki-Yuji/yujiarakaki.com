@@ -61,7 +61,7 @@ main {
 .articleDetailPage h1,.articleDetailPage h2,.articleDetailPage h3,.articleDetailPage h4 {
   margin: 1.75em 0;
 }
-.articleDetailPage pre,.articleDetailPage code {
+.articleDetailPage pre{
   background: #f5f5f5;
   border: none;
   white-space: pre-wrap;

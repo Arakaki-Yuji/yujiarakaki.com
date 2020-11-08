@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Clojureの開発環境をdocker-composeで作る | Yuji Arakaki</title><link href="/assets/css/main.css" rel="stylesheet"><link href="/apple-touch-icon.png" ref="apple-touch-icon" sizes="180x180"><link href="/favicon-32x32.png" ref="icon" sizes="32x32" type="image/png"><link href="/favicon-16x16.png" ref="icon" sizes="16x16" type="image/png"><link href="/site.webmanifest" ref="manifest"><link color="#5bbad5" href="/safari-pinned-tab.svg" ref="manifest"><meta content="#da532c" name="msapplication-TileColor"><meta content="#ffffff" name="theme-color"><meta content="Clojureの開発環境をdocker-composeで作る | Yuji Arakaki" property="og:title"><meta content="website" property="og:type"><meta content="Yuji Arakaki" property="og:site_name"><meta content="https://yujiarakaki.com/assets/images/icon.jpg" property="og:image"><meta content="summary" name="twitter:card"><meta content="@arakaji" name="twitter:site"></head><body class="articleDetailPage"><header><div class="headerWrapper"><img class="brandLogo" src="/assets/images/icon.jpg"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">Clojureの開発環境をdocker-composeで作る</h1><div class="content"><p>普段RailsやPHPなどでアプリケーション開発するときにはDocker/docker-composeをよく使うのでClojureでも使いたい！と思って環境をセットアップしました。</p><p>前提としてleiningenを使ったプロジェクトを対象にしています。</p><p><a href="https://gyazo.com/552065f790ded9de06016c668c572546"><video alt="Video from Gyazo" width="1000" autoplay muted loop playsinline controls><source src="https://i.gyazo.com/552065f790ded9de06016c668c572546.mp4" type="video/mp4" /></video></a></p><h1>Dockerfileを作る</h1><p>clojure用の<a href='https://hub.docker.com/_/clojure/'>公式イメージ</a>が用意されているのでそれを使って以下のようなDockerfileを作ります。</p><pre><code>FROM clojure:openjdk-8-lein
+COPY project.clj /usr/src/app/
+WORKDIR /usr/src/app
+RUN lein deps
+COPY . /usr/src/app
+
+CMD &#91;&quot;lein&quot;, &quot;repl&quot;, &quot;:headless&quot;&#93;
+</code></pre><p>ポイントは2行目で先にproject.cljをコピーし4行目でlein depsを実行して依存ライブラリのインストールを行っているところです。 これによりコンテナイメージの中で依存ライブラリが入っている状態が作れ、docker runでの起動処理がその分速くなります。先にlein depsしていないと、docker runでlein replを実行するたびに依存ライブラリのインストールが行われてしまいます。</p><h1>docker-compose.ymlを作る</h1><p>以下のようなdocker-compose.ymlを作ります。</p><pre><code>version: '3.4'
+
+services:
+  clojure:
+    build: .
+    environment:
+      LEIN&#95;REPL&#95;PORT: 46123
+      LEIN&#95;REPL&#95;HOST: 0.0.0.0
+    ports:
+      - '46123:46123'
+    volumes:
+      - .:/usr/src/app
+</code></pre><p>ポイントは環境変数(environment)として<code>LEIN&#95;REPL&#95;PORT</code>と<code>LEIN&#95;REPL&#95;HOST</code>を渡しているところです。 <code>LEIN&#95;REPL&#95;PORT</code>は<code>lein repl</code>で起動したREPLサーバーがどのポートで接続を受け付けるかを指定します。 <code>LEIN&#95;REPL&#95;HOST</code>は<code>lein repl</code>で起動したREPLサーバーがどのホストからの接続を受け付けるかを指定します。</p><p>今回はPortは46123、Hostは0.0.0.0なのでどこからの接続でも受け付けるように指定しています。(Host: 0.0.0.0は開発環境だからゆるく設定していますが、本番・検証環境などではもっと厳しい設定にしてください。)</p><p>この状態で<code>docker-compose up --build</code>を実行するとlein replを起動したコンテナが立ち上がります。</p><h1>Emacsのciderからコンテナ内のREPLに接続する</h1><p>ciderには <code>cider-connect</code>というコマンドがあってそのコマンドを実行すると接続したいREPLのHOSTとPORTを指定して接続することができます。</p><p><code>M-x cider-connect</code>と打つと、cider-connectを使うことができます。</p></div></section></main><footer><div class="footerWrapper"><h2>プロフィール</h2><p>新垣雄志(Arakaki Yuji)。沖縄でベンチャー・スタートアップ界隈を主戦場としているソフトウェアエンジニア。現在はCBcloud株式会社に所属。本サイトではソフトウェアエンジニアとしての日々の活動や学習の記録、自分の考えを言語化して発信するための場として運営している。</p><h3>SNS</h3><ul><li><a href="https://twitter.com/arakaji">Twitter</a></li><li><a href="https://github.com/Arakaki-Yuji">GitHub</a></li><li><a href="https://www.facebook.com/yuuji.arakaki">Facebook</a></li></ul></div></footer></body></html>
