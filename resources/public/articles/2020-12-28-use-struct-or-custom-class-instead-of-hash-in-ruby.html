@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html><head><!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src='https://www.googletagmanager.com/gtag/js?id=G-DDCP223CXX'></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DDCP223CXX');
+</script><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Rubyで、複数の値を一つの引数として受け取りたい場合、Hashではなく独自クラスかStructを使うように設計しよう | Yuji Arakaki</title><link href="/assets/css/main.css" rel="stylesheet"><link href="/apple-touch-icon.png" ref="apple-touch-icon" sizes="180x180"><link href="/favicon-32x32.png" ref="icon" sizes="32x32" type="image/png"><link href="/favicon-16x16.png" ref="icon" sizes="16x16" type="image/png"><link href="/site.webmanifest" ref="manifest"><link color="#5bbad5" href="/safari-pinned-tab.svg" ref="manifest"><meta content="#da532c" name="msapplication-TileColor"><meta content="#ffffff" name="theme-color"><meta content="Rubyで、複数の値を一つの引数として受け取りたい場合、Hashではなく独自クラスかStructを使うように設計しよう | Yuji Arakaki" property="og:title"><meta content="website" property="og:type"><meta content="Yuji Arakaki" property="og:site_name"><meta content="https://yujiarakaki.com/assets/images/icon.jpg" property="og:image"><meta content="summary" name="twitter:card"><meta content="@arakaji" name="twitter:site"></head><body class="articleDetailPage"><header><div class="headerWrapper"><img class="brandLogo" src="/assets/images/icon.jpg"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">Rubyで、複数の値を一つの引数として受け取りたい場合、Hashではなく独自クラスかStructを使うように設計しよう</h1><div class="content"><p>最近の自分のテーマのひとつとして、「複雑で巨大になっていくシステムをRubyそしてRuby on Railsで上手く作っていくか」というのを考えています。</p><p>最終的には上手く整理してまとめたいのですが、一旦考えている小さなアイディア一つ一つをブログしていく予定で、今回は「Hashの代わりに独自クラスかStructを使う」というアイディアについて書いていきます。</p><p>RubyにはHashというkey -> valueの形式で複数の値を保持できるクラスがあります。 これはRubyでプログラミングするときに使う基本的なデータ型でもあり、非常に便利なので複数の値を保持するような構造を持つデータを表現するためによく使われます。</p><p>例えば四角形(Square)の面積を計算するプログラムを書きたい場合、縦(height)と横(width)の長さの値が必要なために、以下のようにHashを引数として受け取るプログラムを書くことがあります。</p><pre><code class="rb"># 四角形の面積を計算する
+def calc&#95;area&#40;square&#41;
+  square&#91;:height&#93; &#42; square&#91;:width&#93;
+end
+
+square = { height: 200, width: 100 }
+
+calc&#95;area&#40;square&#41;
+
+</code></pre><p>では、このプログラムの何が問題なのでしょうか？</p><p>引数が特定のキーを持つハッシュであることを想定しているメソッドにtypoなどをして間違ったキーを持つハッシュを渡した場合以下のようなエラーが発生します。</p><pre><code>invalid&#95;square = { height: 200, :widthh: 100}
+calc&#95;area&#40;square&#41;
+#=&gt; TypeError &#40;nil can't be coerced into Integer&#41;
+</code></pre><p>これは<code>nil は Integer に型変換できない</code>ということを意味しています。(または<code>nilはIntegerとして処理することができない</code>)</p><p>これだけだと、そのエラーメッセージだけで引数に与えている値が間違っていることを推測することは難しくメソッド内部の実装を読んでいかなければなりません。</p><p>calc_areaを、たとえばheightとwidthというメソッドを持つオブジェクトを受け取るメソッドとして実装すると間違った引数を与えた場合のエラーメッセージが変わります。</p><pre><code># 四角形の面積を計算する
+def calc&#95;area&#40;square&#41;
+  square.height &#42; square.width
+end
+
+
+Square = Struct.new&#40;:height, :width&#41;
+
+valid&#95;square = Square.new&#40;200, 100&#41;
+calc&#95;area&#40;valid&#95;square&#41;
+#=&gt; 20000
+
+invalid&#95;square = Struct.new&#40;:height, :widthh&#41;.new&#40;200,100&#41;
+calc&#95;area&#40;invalid&#95;square&#41;
+#=&gt; NoMethodError &#40;undefined method `width' for #&lt;struct height=200, widthh=100&gt;&#41;
+</code></pre><p>このように、引数で渡したオブジェクトにwidthというメソッドがないということが明確に指摘されます。 このエラーメッセージのわかりやすさの違いは小さなプログラムでは大した違いになりませんが、システムが大きく複雑になるほどに適切なエラーメッセージがでることは生産性に大きく影響が出るために非常に重要です</p><p>引数をハッシュではなく特定のメソッドをもつオブジェクトとして受け取るメリットは設計の改善をしていく上での柔軟性を得るためにも重要です。</p><p>例えば四角形(Square)を表すデータ構造が様々なところで使う事がわかり、独自クラスとして定義し直す場合でもcalc_areaは実装を変更することなく利用することができます。</p><pre><code>class Square
+  attr&#95;accessor :height, :width
+end
+
+s = Square.new&#40;200, 100&#41;
+calc&#95;area&#40;s&#41;
+#=&gt; 20000
+</code></pre><p>このように設計を改善していく上でも、メソッドの引数としてHashではなく 特定のメソッドをもつオブジェクトを受け取るようにすることは重要です。</p><p>では、なぜ多くの人がHashを受け取るようなコードを書いてしまうのでしょうか？</p><p>これはおそらく、自分たちが普段利用するライブラリやフレームワークのコードが複数の値を引数で受け取りたいときにHashを使っているからだと考えられます。</p><p>では、なぜライブラリやフレームワークではHashを受け取るようにしているのでしょうか？</p><p>これは複数の値を一つのオブジェクトとしてまとめて受け渡す方法としてHashがもっとも簡単な方法ではあるからです。Hashはシンタックスシュガーも用意されているため、わざわざは<code>Hash.new</code>などしなくても<code>{}</code>を使うことでオブジェクトを作ることができます。また特定のアプリケーションドメインによらないデータ形式なので、大規模プログラムでも書き捨てのプログラムでも使うことができます。</p><p>ライブラリのコードは様々なユースケースで簡単に使えるようにRubyの基本的なデータ構造(String, Integer, Hash, Array)を受け取る方にしたほうがよく、逆に私たちが作るシステムのプログラムは呼び出しを多少を面倒にする代わりに表現力、柔軟性を増してメンテナンスしやすいように特定のメソッドを持つオブジェクトを受け取るようにしたほうが良いと考えています。</p><h1>まとめ</h1><p>アプリケーションコードで複数の値を一つの引数として受け取りたい場合には、Hashではなく特定のメソッドをもつオブジェクト、独自クラスまたはStructを受け取るようなコードを書こう。</p></div></section></main><footer><div class="footerWrapper"><h2>プロフィール</h2><p>新垣雄志(Arakaki Yuji)。沖縄でベンチャー・スタートアップ界隈を主戦場としているソフトウェアエンジニア。現在はCBcloud株式会社に所属。本サイトではソフトウェアエンジニアとしての日々の活動や学習の記録、自分の考えを言語化して発信するための場として運営している。</p><h3>SNS</h3><ul><li><a href="https://twitter.com/arakaji">Twitter</a></li><li><a href="https://github.com/Arakaki-Yuji">GitHub</a></li><li><a href="https://www.facebook.com/yuuji.arakaki">Facebook</a></li></ul></div></footer></body></html>
