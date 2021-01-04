@@ -32,7 +32,7 @@ calc_area(square)
 #=> TypeError (nil can't be coerced into Integer)
 ```
 
-これは`nil は Integer に型変換できない`ということを意味しています。(または`nilはIntegerとして処理することができない`)
+これは「nil は Integer に型変換できない」ということを意味しています。(または「nilはIntegerとして処理することができない」)
 
 これだけだと、そのエラーメッセージだけで引数に与えている値が間違っていることを推測することは難しくメソッド内部の実装を読んでいかなければなりません。
 

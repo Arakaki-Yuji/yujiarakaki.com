@@ -3,6 +3,7 @@ body {
   background-color: #fff;
   color: #0c0c0c;
   line-height: 1.75;
+  font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,Segoe UI,Hiragino Kaku Gothic ProN,Hiragino Sans,ヒラギノ角ゴ ProN W3,Arial,メイリオ,Meiryo,sans-serif;
 }
 
 header {
@@ -67,6 +68,7 @@ main {
   white-space: pre-wrap;
   padding: 15px;
   margin: 2rem 0;
+  font-family: -apple-system,BlinkMacSystemFont,Helvetica Neue,Segoe UI,Hiragino Kaku Gothic ProN,Hiragino Sans,ヒラギノ角ゴ ProN W3,Arial,メイリオ,Meiryo,sans-serif;
 }
 .articleDetailPage .content a {
   color: #0c0c0c;
