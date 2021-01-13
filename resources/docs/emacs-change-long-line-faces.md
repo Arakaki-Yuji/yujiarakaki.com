@@ -16,5 +16,13 @@ whitespace-modeをoffにするとこの現象は消すことができるので�
 (setq whitespace-line-column 300)
 ```
 
+# どうやって上記の方法を見つけることができたか？
+EmacsのFaceに関する公式ドキュメントを読んでいるときに list-faces-display というコマンドで 各faceの名前とそのFace(色、フォント、背景色など)が一覧で確認できることを知りました。
+
+その一覧画面を見ながら文字数が80文字を変えたときに変わるに色が設定されているfaceを探し、そのfaceの詳細を見ることで whitespace-line-column という変数があることを知ることができました。
+
+[![Image from Gyazo](https://i.gyazo.com/b8159dd7e475a3844bd0c7850d8668bc.gif)](https://gyazo.com/b8159dd7e475a3844bd0c7850d8668bc)
+
 # 参考
 - [WhiteSpace](https://www.emacswiki.org/emacs/WhiteSpace)
+- [テキストのフェイス](https://ayatakesi.github.io/emacs/25.1/Faces.html#Faces)
