@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html><head><!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src='https://www.googletagmanager.com/gtag/js?id=G-DDCP223CXX'></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-DDCP223CXX');
+</script><meta charset="utf-8"><meta content="width=device-width, initial-scale=1" name="viewport"><title>Clojureの正規表現パターンにフラグを追加する | Yuji Arakaki</title><link href="/assets/css/main.css" rel="stylesheet"><link href="/apple-touch-icon.png" ref="apple-touch-icon" sizes="180x180"><link href="/favicon-32x32.png" ref="icon" sizes="32x32" type="image/png"><link href="/favicon-16x16.png" ref="icon" sizes="16x16" type="image/png"><link href="/site.webmanifest" ref="manifest"><link color="#5bbad5" href="/safari-pinned-tab.svg" ref="manifest"><meta content="#da532c" name="msapplication-TileColor"><meta content="#ffffff" name="theme-color"><meta content="Clojureの正規表現パターンにフラグを追加する | Yuji Arakaki" property="og:title"><meta content="website" property="og:type"><meta content="Yuji Arakaki" property="og:site_name"><meta content="https://yujiarakaki.com/assets/images/icon.jpg" property="og:image"><meta content="summary" name="twitter:card"><meta content="@arakaji" name="twitter:site"></head><body class="articleDetailPage"><header><div class="headerWrapper"><img class="brandLogo" src="/assets/images/icon.jpg"><div class="brandTitle"><a href="/">Yuji Arakaki</a></div></div></header><main><section class="article"><h1 class="articleTitle">Clojureの正規表現パターンにフラグを追加する</h1><div class="content"><p>Clojureで正規表現パターンを作るときは以下のように書く。</p><pre><code class=":clojure">#&quot;pattern&quot;
+=&gt; #&quot;pattern&quot;
+
+&#40;re-find #&quot;pattern&quot; &quot;this is a pattern&quot;&#41; ;; 文字列の中からパターンが見つかるか探す
+=&gt; &quot;pattern&quot;
+
+</code></pre><p><code>#&quot;pattern&quot;</code> という記法で生成されるのは java.util.regex.Pattern クラスのインスタンスである。 java.util.regex.Patternはインスタンスを生成するcompileメソッドを呼び出すときにフラグを指定することで例えば大文字小文字を区別しないなどの挙動に変更することができる。 そのフラグ指定をClojureの <code>#&quot;pattern&quot;</code> 記法で指定したい場合、<code>#&quot;&#40;?i&#41;pattern&quot;</code>のように (?フラグ) を入れることで指定できる。</p><pre><code class=":clojure">&#40;class #&quot;pattern&quot;&#41;
+=&gt; java.util.regex.Pattern
+
+&#40;java.util.regex.Pattern/compile &quot;pattern&quot;&#41;
+=&gt; #&quot;pattern&quot;
+
+&#40;re-find &#40;java.util.regex.Pattern/compile &quot;pattern&quot;&#41; 
+         &quot;this is a pattern&quot;&#41;
+=&gt; &quot;pattern&quot;
+
+&#40;re-find &#40;java.util.regex.Pattern/compile &quot;pattern&quot;&#41; 
+         &quot;this is a patteRN&quot;&#41;
+=&gt; nil 
+
+&#40;re-find &#40;java.util.regex.Pattern/compile &quot;pattern&quot; 
+                                          java.util.regex.Pattern/CASE&#95;INSENSITIVE&#41; 
+		&quot;this is a patteRN&quot;&#41;
+=&gt; &quot;patteRN&quot;
+
+&#40;re-find #&quot;pattern&quot; &quot;this is a pattern&quot;&#41;
+=&gt; &quot;pattern&quot;
+
+&#40;re-find #&quot;pattern&quot; &quot;this is a patteRN&quot;&#41;
+=&gt; nil
+
+&#40;re-find #&quot;&#40;?i&#41;pattern&quot; &quot;this is a patteRN&quot;&#41;
+=&gt; &quot;patteRN&quot;
+</code></pre><h1>参考</h1><ul><li><a href='https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html#CASE_INSENSITIVE'>java.util.regex.Pattern</a></li><li><a href='https://clojuredocs.org/clojure.core/re-find'>re-find</a></li><li><a href='https://stackoverflow.com/questions/53513843/ignore-case-sensitive-in-clojure'>ignore-case-sensitive-in-clojure | Stack Overflow</a></li><li><a href='https://clojure.org/reference/java_interop'>Java interop</a></li></ul></div></section></main><footer><div class="footerWrapper"><h2>プロフィール</h2><p>新垣雄志(Arakaki Yuji)。沖縄でベンチャー・スタートアップ界隈を主戦場としているソフトウェアエンジニア。現在はCBcloud株式会社に所属。本サイトではソフトウェアエンジニアとしての日々の活動や学習の記録、自分の考えを言語化して発信するための場として運営している。</p><h3>SNS</h3><ul><li><a href="https://twitter.com/arakaji">Twitter</a></li><li><a href="https://github.com/Arakaki-Yuji">GitHub</a></li><li><a href="https://www.facebook.com/yuuji.arakaki">Facebook</a></li></ul></div></footer></body></html>
