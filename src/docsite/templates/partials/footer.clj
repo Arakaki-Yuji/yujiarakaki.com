@@ -10,6 +10,7 @@
      [:li [:a {:href "https://twitter.com/arakaji"} "Twitter"]]
      [:li [:a {:href "https://github.com/Arakaki-Yuji"} "GitHub"]]
      [:li [:a {:href "https://www.facebook.com/yuuji.arakaki"} "Facebook"]]
+     [:li [:a {:href "https://note.com/arakaji"} "note"]]
      ]
     ]
    ])
